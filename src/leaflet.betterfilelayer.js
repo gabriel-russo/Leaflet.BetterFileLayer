@@ -208,7 +208,21 @@ L.Control.BetterFileLayer = L.Control.extend({
 
           const addedLayer = layer.addTo(this._map);
 
-          this._map.fitBounds(layer.getBounds());
+          if (layer instanceof L.FeatureGroup) {
+            const bounds = layer.getBounds();
+
+            if (bounds.isValid()) {
+              const southWest = bounds.getSouthWest();
+              const northEast = bounds.getNorthEast();
+              const hasOnlyOnePoint = southWest.equals(northEast);
+
+              if (hasOnlyOnePoint) {
+                this._map.setView(southWest, 14);
+              } else {
+                this._map.fitBounds(bounds);
+              }
+            }
+          }
 
           this._map.fire("bfl:layerloaded", { layer: addedLayer }, this);
         } catch (err) {
