@@ -10,7 +10,7 @@
 
     <!-- Files from current project -->
     <link rel="stylesheet" href="dist/leaflet.betterfilelayer.css">
-    <script type="text/javascript" src="dist/leaflet.betterfilelayer.min.js"></script>
+    <script type="text/javascript" src="dist/leaflet.betterfilelayer.js"></script>
 </head>
 <body>
 <div id="map" style="width: 98vw; height: 85vh"></div>
@@ -23,6 +23,15 @@
   const map = L.map('map')
     .setView([-8.748008188078693, -63.88549804687501], 13)
     .addLayer(osm);
+
+  map.on("bfl:layerloaded", (ev) => {
+    console.log(ev);
+    map.fitBounds(ev.layer.getBounds());
+  });
+
+  map.on("bfl:layerloaderror", (ev) => {
+    console.log(ev);
+  });
 
   L.Control.betterFileLayer()
     .addTo(map);

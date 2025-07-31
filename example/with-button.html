@@ -11,11 +11,15 @@
             integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <!-- Leaflet BetterFileLayer DEVELOPMENT -->
+    <!--    <link rel="stylesheet" href="../dist/leaflet.betterfilelayer.css">-->
+    <!--    <script type="text/javascript" src="../dist/leaflet.betterfilelayer.js"></script>-->
+
     <!-- Leaflet BetterFileLayer -->
     <script type="application/javascript"
-            src="https://unpkg.com/leaflet-better-filelayer@0.1.1/dist/leaflet.betterfilelayer.min.js"
+            src="https://unpkg.com/leaflet-better-filelayer@1.0.0/dist/leaflet.betterfilelayer.js"
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@0.1.1/dist/leaflet.betterfilelayer.css"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.0/dist/leaflet.betterfilelayer.css"
           crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 
@@ -97,8 +101,14 @@
     button: document.getElementById("input-btn")
   };
 
-  L.Control.betterFileLayer(options)
+  L.control.betterFileLayer(options)
     .addTo(map);
+  
+  map.on("bfl:layerloaded", (ev) => {
+    console.log(ev);
+    map.fitBounds(ev.layer.getBounds());
+  });
+
 </script>
 
 </html>

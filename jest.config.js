@@ -1,4 +1,4 @@
 module.exports = {
-  moduleFileExtensions: ['js'],
-  moduleDirectories: ['node_modules', 'src'],
+  preset: 'ts-jest',
+  testEnvironment: 'jest-fixed-jsdom',
 };
