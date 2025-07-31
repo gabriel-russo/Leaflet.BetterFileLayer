@@ -1,0 +1,19 @@
+.leaflet-control-better-filelayer {
+  background-color: #fafafa;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  background-image: url('images/better-filelayer.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.leaflet-control-better-filelayer input[type='file'] {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}

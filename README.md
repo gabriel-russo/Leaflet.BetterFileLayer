@@ -9,8 +9,10 @@
 
 ---
 
-This is a [Leaflet](http://leafletjs.com/) plugin for loading your spatialized data into leaflet based on [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore) and [Leaflet.FileLayer](https://github.com/makinacorpus/Leaflet.FileLayer) plugins.
-This plugin was made looking for a convenient and easy to use plugin for loading external spatial files to leaflet. 
+This is a [Leaflet](http://leafletjs.com/) plugin for loading your spatialized data into leaflet based
+on [leaflet-omnivore](https://github.com/mapbox/leaflet-omnivore)
+and [Leaflet.FileLayer](https://github.com/makinacorpus/Leaflet.FileLayer) plugins.
+This plugin was made looking for a convenient and easy to use plugin for loading external spatial files to leaflet.
 
 It currently supports:
 
@@ -22,8 +24,10 @@ It currently supports:
 * [KMZ](https://developers.google.com/kml/documentation/kmzarchives)
 * [WKT](http://en.wikipedia.org/wiki/Well-known_text) (via [wellknown](https://github.com/mapbox/wellknown))
 * [TopoJSON](https://github.com/mbostock/topojson) (via [topojson-client](https://github.com/topojson/topojson-client))
-* [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) (via [polyline](https://github.com/mapbox/polyline))
-* [Shapefile](https://en.wikipedia.org/wiki/Shapefile) (via [shpjs](https://github.com/calvinmetcalf/shapefile-js/tree/gh-pages)) (zipped or separate files)
+* [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) (
+  via [polyline](https://github.com/mapbox/polyline))
+* [Shapefile](https://en.wikipedia.org/wiki/Shapefile) (
+  via [shpjs](https://github.com/calvinmetcalf/shapefile-js/tree/gh-pages)) (zipped or separate files)
 
 ## Installation
 
@@ -34,6 +38,9 @@ npm install leaflet-better-filelayer
 ## Demo
 
 Checkout the [Demo](https://gabriel-russo.github.io/Leaflet.BetterFileLayer/example/)
+
+Checkout
+the [Demo with external button](https://gabriel-russo.github.io/Leaflet.BetterFileLayer/example/with-button.html)
 
 Below gif show an example of loading a separated shapefile using drag and drop.
 
@@ -52,51 +59,30 @@ const map = L.map('map', { betterFileLayerControl: true })
 Or like any control
 
 ```js
-L.Control.betterFileLayer().addTo(map);
+L.control.betterFileLayer()
+  .addTo(map);
+
+// or
+
+const control = new L.Control.BetterFileLayer();
+
+control.addTo(map);
 ```
 
-## Docs
+## Documentation
 
-> For more detailed docs, please check the [wiki](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki)
+> [Go to Wiki page](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki)
 
-### Options:
-```js
-// The Options object
-options = {
-  position: 'topleft', // Leaflet control position
-  fileSizeLimit: 1024, // File size limit in kb (default: 1024 kb)
-  style: () => {}, // Overwrite the default BFL GeoJSON style function
-  onEachFeature: () => {}, // Overwrite the default BFL GeoJSON onEachFeature function
-  layer: L.customLayer, // If you want a custom layer to be used (must be a GeoJSON class inheritance)
-  // Restrict accepted file formats (default: .gpx, .kml, .kmz, .geojson, .json, .csv, .topojson, .wkt, .shp, .shx, .prj, .dbf, .zip)
-  formats:['.geojson', '.kml', '.gpx'],
-  importOptions: { // Some file types may have import options, for now, just csv is documented
-    csv: {
-      delimiter: ';',
-      latfield: 'LAT',
-      lonfield: 'LONG',
-    },
-  },
-  text: { // If you need translate
-    title: "Import a layer", // Plugin Button Text
-  },
-}
-```
+## Typescript support
 
-### Events
-
-| Event Name                   | Data               | Description                                                                                                          |
-|------------------------------|--------------------|----------------------------------------------------------------------------------------------------------------------|
-| `bfl:layerloaded`            | { layer: L.Layer } | Event fired when the data is sucessfuly loaded on map. It returns the layer reference                                |
-| `bfl:layerloaderror`         | { layer: string }  | Event fired when the loader fails to load your file. It returns the name of the file                                 |
-| `bfl:filenotsupported`       | { layer: string }  | Event fired when the loader does not support the file type of your file. It returns the name of the file             |
-| `bfl:layerisempty`         | { layer: string }  | Event fired when the layer haven't any features. It returns the name of the file                                     |
-| `bfl:filesizelimit`         | { layer: string }  | Event fired when the file's size exceeds the file size limit (fileSizeLimit option). It returns the name of the file |
-
+![event_types](docs/images/class_types.png)
+![event_types](docs/images/event_types.png)
+![event_types](docs/images/event_handler_types.png)
 
 ### Custom html button
 
-If you are developing a web application and you want to use your own html button outside the map container, you can use the following code:
+If you are developing a web application and you want to use your own html button outside the map container, you can use
+the following code:
 
 ```js
 // Note: The button have to be type "file"
@@ -105,41 +91,62 @@ const options = {
   button: document.getElementById('my-button'), // Your button HTML reference
 }
 
-const control = L.Control.betterFileLayer(options)
+const control = L.control.betterFileLayer(options)
   .addTo(map);
 ```
+
 After that, the plugin will bind an "on change" event on this button, waiting for files.
 
 You can see the example [here](https://gabriel-russo.github.io/Leaflet.BetterFileLayer/example/with-button.html)
 
 `Note:` The Drag and Drop event listener will bind it self automatically
 
+#### For Framework (React, Angular...) devs
+
+To be less painful to handle render states with Frameworks + Leaflet Control, you can bind the button
+later, doing this:
+
+```ts
+const options = {
+    will_bind_button_later: true
+}
+
+const control = L.control.betterFileLayer(options)
+    .addTo(map);
+
+// Example using React
+// ref = useRef();....
+// <input ref={ref} ... />
+control.bind_button(ref.current);
+```
+
 ## Development
 
 Install the development dependencies
+
 ```commandline
 npm install --save-dev
 ```
 
-Start the webpack watch to compile and save at dist/ after any change
-```commandline
-npm run dev
-```
+`npm run build` after any change and check changes.
 
-Open `index.html` in your browser and start editing
+Open `index.html` in your browser and start editing.
 
 ### Test
 
 To run unity tests:
+
 ```commandline
 npm run test
 ```
 
 ## Authors
-- Gabriel Russo
+
+- Gabriel Russo <gabrielrusso@protonmail.com>
 
 ## Credits
 
+- Copyright (c) 2025, Gabriel Russo
 - Copyright (c) 2014, Mapbox
 - Copyright (c) 2012, Michael Bostock
 - Copyright (c) 2012 Makina Corpus
