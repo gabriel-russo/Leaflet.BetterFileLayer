@@ -21,11 +21,11 @@ It currently supports:
 * [JSON](http://geojson.org/) (Using the GeoJSON structure)
 * [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) (via [csv2geojson](https://github.com/mapbox/csv2geojson))
 * [GPX](https://wiki.openstreetmap.org/wiki/GPX) (
-  via [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser))
+  via [togeojson](https://github.com/mapbox/togeojson))
 * [KML](https://developers.google.com/kml/documentation/) (
-  via [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser))
+  via [togeojson](https://github.com/mapbox/togeojson))
 * [KMZ](https://developers.google.com/kml/documentation/kmzarchives) (
-  via [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser))
+  via [zip.js](https://github.com/gildas-lormeau/zip.js/) + [togeojson](https://github.com/mapbox/togeojson))
 * [WKT](http://en.wikipedia.org/wiki/Well-known_text) (via [wellknown](https://github.com/mapbox/wellknown))
 * [TopoJSON](https://github.com/mbostock/topojson) (via [topojson-client](https://github.com/topojson/topojson-client))
 * [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) (
@@ -89,10 +89,10 @@ If you are developing a web application and you want to use your own html button
 the following code:
 
 ```js
-// Note: The button have to be type "file"
+// Note: The input have to be type "file"
 // Example: <input type="file" accept=".gpx,.kml,.geojson,.json" multiple />
 const options = {
-  button: document.getElementById('my-button'), // Your button HTML reference
+  button: document.getElementById('my-button'), // Your input HTML reference
 }
 
 const control = L.control.betterFileLayer(options)
@@ -115,7 +115,7 @@ I made a example using React, you can check in the `react` folder.
 
 #### Handling component creation
 
-To handle conditional created input, you can tell the plugin that you will bind the button later.
+To handle conditional created input, you can tell the plugin that you will bind the input later.
 
 Like this:
 
