@@ -45,9 +45,6 @@ declare module 'leaflet' {
     ): Control.BetterFileLayer;
   }
 
-  /*
-   * Estende a classe abstrata Evented do Leaflet.
-   */
   export interface Evented {
     on(type: 'bfl:layerloaded', fn: LayerLoadedEventHandler): this;
 

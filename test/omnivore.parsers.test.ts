@@ -3,13 +3,17 @@
  */
 
 /*
-Fix TextEncoder is not defined
+Fix TextEncoder is not defined error
 */
 import { TextEncoder, TextDecoder } from 'util';
 
-global.TextEncoder = TextEncoder;
-// @ts-expect-error
-global.TextDecoder = TextDecoder;
+Object.assign(global, {
+  TextEncoder: TextEncoder,
+});
+
+Object.assign(global, {
+  TextDecoder: TextDecoder,
+});
 
 import { test, expect } from '@jest/globals';
 import { readFileSync } from 'node:fs';

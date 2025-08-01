@@ -16,12 +16,16 @@ This plugin was made looking for a convenient and easy to use plugin for loading
 
 It currently supports:
 
-* [GeoJSON](http://geojson.org/)
+* [GeoJSON](http://geojson.org/) (
+  via [JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON))
 * [JSON](http://geojson.org/) (Using the GeoJSON structure)
 * [CSV](http://en.wikipedia.org/wiki/Comma-separated_values) (via [csv2geojson](https://github.com/mapbox/csv2geojson))
-* [GPX](https://wiki.openstreetmap.org/wiki/GPX)
-* [KML](https://developers.google.com/kml/documentation/)
-* [KMZ](https://developers.google.com/kml/documentation/kmzarchives)
+* [GPX](https://wiki.openstreetmap.org/wiki/GPX) (
+  via [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser))
+* [KML](https://developers.google.com/kml/documentation/) (
+  via [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser))
+* [KMZ](https://developers.google.com/kml/documentation/kmzarchives) (
+  via [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser))
 * [WKT](http://en.wikipedia.org/wiki/Well-known_text) (via [wellknown](https://github.com/mapbox/wellknown))
 * [TopoJSON](https://github.com/mbostock/topojson) (via [topojson-client](https://github.com/topojson/topojson-client))
 * [Encoded Polylines](https://developers.google.com/maps/documentation/utilities/polylinealgorithm) (
@@ -101,10 +105,19 @@ You can see the example [here](https://gabriel-russo.github.io/Leaflet.BetterFil
 
 `Note:` The Drag and Drop event listener will bind it self automatically
 
-#### For Framework (React, Angular...) devs
+### For Framework devs
 
-To be less painful to handle render states with Frameworks + Leaflet Control, you can bind the button
-later, doing this:
+#### Components
+
+If you made a component for this plugin, feel free to share, make a pull request!
+
+I made a example using React, you can check in the `react` folder.
+
+#### Handling component creation
+
+To handle conditional created input, you can tell the plugin that you will bind the button later.
+
+Like this:
 
 ```ts
 const options = {

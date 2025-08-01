@@ -1,6 +1,6 @@
 {
   "name": "leaflet-better-filelayer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Load spatialized files into leaflet using the HTML FileReader API",
   "files": [
     "dist"
@@ -25,7 +25,8 @@
   "scripts": {
     "test": "jest",
     "build": "vite build && tsc --target ES2022 --declaration --emitDeclarationOnly --skipLibCheck --outDir dist/ src/index.ts",
-    "lint": "eslint .",
+    "pack": "npm run build && npm pack",
+    "lint": "eslint src/",
     "style": "prettier --write \"src/**/*.{ts,js,css}\" --log-level=warn"
   },
   "repository": {
