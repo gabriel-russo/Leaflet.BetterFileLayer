@@ -13,9 +13,9 @@
 
     <!-- Leaflet BetterFileLayer -->
     <script type="application/javascript"
-            src="https://unpkg.com/leaflet-better-filelayer@1.0.0/dist/leaflet.betterfilelayer.js"
+            src="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.js"
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.0/dist/leaflet.betterfilelayer.css"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.css"
           crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 
@@ -62,8 +62,15 @@
     .setView([-15.798654271090207, -47.86738872528077], 4)
     .addLayer(wi);
 
-  L.control.betterFileLayer()
+  // 10MB file size Limit
+  L.control.betterFileLayer({ fileSizeLimit: 10485760 })
     .addTo(map);
+
+  map.on("bfl:layerloaded", (ev) => {
+    console.log(ev);
+    map.fitBounds(ev.layer.getBounds());
+  });
+
 </script>
 
 </html>

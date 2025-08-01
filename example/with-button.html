@@ -17,9 +17,9 @@
 
     <!-- Leaflet BetterFileLayer -->
     <script type="application/javascript"
-            src="https://unpkg.com/leaflet-better-filelayer@1.0.0/dist/leaflet.betterfilelayer.js"
+            src="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.js"
             crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.0/dist/leaflet.betterfilelayer.css"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.css"
           crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
 
@@ -98,12 +98,13 @@
     .addLayer(osm);
 
   const options = {
-    button: document.getElementById("input-btn")
+    button: document.getElementById("input-btn"),
+    fileSizeLimit: 10485760 // 10MB
   };
 
   L.control.betterFileLayer(options)
     .addTo(map);
-  
+
   map.on("bfl:layerloaded", (ev) => {
     console.log(ev);
     map.fitBounds(ev.layer.getBounds());
