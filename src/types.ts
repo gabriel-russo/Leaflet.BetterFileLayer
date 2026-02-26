@@ -2,12 +2,17 @@
  Event Handlers
 */
 
-import * as L from 'leaflet';
-import { Feature } from 'geojson';
+import type {
+  ControlOptions,
+  ControlPosition,
+  GeoJSON,
+  Layer,
+  PathOptions,
+} from 'leaflet';
+import type { Feature } from 'geojson';
 
 export type LayerLoadedEventHandler = (e: {
-  layer: L.GeoJSON;
-  id: string;
+  layer: GeoJSON;
   fileName: string;
   fileExtension: string;
   fileSize: number;
@@ -60,19 +65,27 @@ export type SupportedExtensions =
   | '.shp'
   | '.shx'
   | '.dbf'
-  | '.prj';
+  | '.prj'
+  | '.cpg';
 
-export interface BetterFileLayerControlOptions extends L.ControlOptions {
-  position?: L.ControlPosition;
-  fileSizeLimit?: number;
-  style?: (feature: Feature) => L.PathOptions;
-  onEachFeature?: (feature: Feature, layer: L.Layer) => void;
-  layer?: L.GeoJSON;
-  extensions?: SupportedExtensions[];
-  importOptions?: Record<string, object>;
-  text?: {
+export interface BetterFileLayerControlOptions extends ControlOptions {
+  position: ControlPosition;
+  fileSizeLimit: number;
+  style: (feature: Feature) => PathOptions;
+  onEachFeature: (feature: Feature, layer: Layer) => void;
+  layer: GeoJSON;
+  extensions: SupportedExtensions[];
+  csvOptions: {
+    delimiter: string;
+    latfield: string;
+    lonfield: string;
+  };
+  polylineOptions: {
+    precision: number;
+  };
+  text: {
     title: string;
   };
-  will_bind_button_later?: boolean;
   button?: HTMLElement | HTMLInputElement;
+  addOnMap: boolean;
 }

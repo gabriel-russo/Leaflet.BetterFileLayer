@@ -1,6 +1,6 @@
-// @ts-ignore
 import JSZip from 'jszip';
-import { Feature } from 'geojson';
+import type { Feature } from 'geojson';
+import type { PathOptions } from 'leaflet';
 
 /*
  * Returns the file's extension without dot
@@ -69,13 +69,17 @@ export async function processShapeFiles(files: File[]): Promise<File[]> {
 }
 
 /*
- * Filters all files that are part of a shapefile's components (shp, dbf, prj...)
+ * Remove all files that are part of a shapefile's components (shp, dbf, prj...)
  */
-export function filterShpComponents(files: File[]): File[] {
+export function removeShpComponents(files: File[]): File[] {
   const filteredFiles: File[] = [];
 
   for (const file of files) {
-    if (!['shp', 'shx', 'dbf', 'prj'].includes(getFileExtension(file))) {
+    if (
+      !['shp', 'shx', 'dbf', 'prj', 'cpg', 'sbx', 'sbn'].includes(
+        getFileExtension(file)
+      )
+    ) {
       filteredFiles.push(file);
     }
   }
@@ -86,13 +90,9 @@ export function filterShpComponents(files: File[]): File[] {
 /*
  * Transform the simple style spec from feature props to Leaflet Path styles options
  */
-export function simpleStyleToLeafletStyle(feature: Feature) {
-  if (!feature.properties) {
-    return;
-  }
-
+export function simpleStyleToLeafletStyle(feature: Feature): PathOptions {
   // https://github.com/mapbox/simplestyle-spec/tree/master/1.1.0
-  const simpleStyleSpecMap: Record<string, string> = {
+  const simpleStyleSpecMap: object = {
     stroke: 'color',
     'stroke-opacity': 'opacity',
     'stroke-width': 'weight',
@@ -100,16 +100,12 @@ export function simpleStyleToLeafletStyle(feature: Feature) {
     'fill-opacity': 'fillOpacity',
   } as const;
 
-  const leafletPathOptions: Record<string, string> = {};
+  const leafletPathOptions: PathOptions = {};
 
   for (const style in simpleStyleSpecMap) {
-    if (style in feature.properties) {
+    if (feature.properties && style in feature.properties) {
       leafletPathOptions[simpleStyleSpecMap[style]] = feature.properties[style];
     }
-  }
-
-  if (!Object.keys(leafletPathOptions).length) {
-    return;
   }
 
   return leafletPathOptions;

@@ -6,23 +6,38 @@
 
     <!-- Dependency to Leaflet -->
     <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
-    <script type="text/javascript" src="node_modules/leaflet/dist/leaflet-src.js"></script>
 
     <!-- Files from current project -->
-    <link rel="stylesheet" href="dist/leaflet.betterfilelayer.css">
-    <script type="text/javascript" src="dist/leaflet.betterfilelayer.js"></script>
+    <link rel="stylesheet" href="./dist/leaflet.betterfilelayer.css">
 </head>
 <body>
 <div id="map" style="width: 98vw; height: 85vh"></div>
 </body>
-<script>
-  const osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; 2013 OpenStreetMap contributors',
+<script type="importmap">
+    {
+        "imports": {
+            "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
+            "leaflet-better-filelayer": "./dist/leaflet.betterfilelayer.js"
+        }
+    }
+</script>
+<script type="module">
+  import { Map, TileLayer } from 'leaflet';
+  import { BetterFileLayer } from "leaflet-better-filelayer";
+
+  const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
 
-  const map = L.map('map')
+  const bfl = new BetterFileLayer({ position: "topleft" });
+
+  console.log(bfl);
+
+  const map = new Map('map')
     .setView([-8.748008188078693, -63.88549804687501], 13)
-    .addLayer(osm);
+    .addLayer(tiles)
+    .addControl(bfl);
 
   map.on("bfl:layerloaded", (ev) => {
     console.log(ev);
@@ -33,7 +48,5 @@
     console.log(ev);
   });
 
-  L.Control.betterFileLayer()
-    .addTo(map);
 </script>
 </html>
