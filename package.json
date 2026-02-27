@@ -8,11 +8,11 @@
   "type": "module",
   "main": "./dist/leaflet.betterfilelayer.js",
   "module": "./dist/leaflet.betterfilelayer.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/types.d.ts",
   "styles": "./dist/leaflet.betterfilelayer.css",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/types.d.ts",
       "import": "./dist/leaflet.betterfilelayer.js",
       "require": "./dist/leaflet.betterfilelayer.js",
       "default": "./dist/leaflet.betterfilelayer.js"
@@ -20,6 +20,7 @@
     "./dist/leaflet.betterfilelayer.css": "./dist/leaflet.betterfilelayer.css"
   },
   "scripts": {
+    "dev": "vite build --watch",
     "test": "jest",
     "declaration": "tsc -p tsconfig.build.ts",
     "build": "vite build && npm run declaration",
@@ -56,6 +57,9 @@
     "url": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer/issues"
   },
   "homepage": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer",
+  "peerDependencies": {
+    "leaflet": ">=2.0.0-alpha.1"
+  },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
     "@mapbox/togeojson": "^0.16.2",
@@ -63,7 +67,6 @@
     "buffer": "^6.0.3",
     "csv2geojson": "^5.1.2",
     "jszip": "^3.10.1",
-    "leaflet": ">=2.0.0-alpha.1",
     "shpjs": "^6.2.0",
     "topojson-client": "^3.1.0",
     "wellknown": "^0.5.0"

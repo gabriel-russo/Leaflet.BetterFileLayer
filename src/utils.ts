@@ -76,7 +76,7 @@ export function removeShpComponents(files: File[]): File[] {
 
   for (const file of files) {
     if (
-      !['shp', 'shx', 'dbf', 'prj', 'cpg', 'sbx', 'sbn'].includes(
+      !['shp', 'shx', 'dbf', 'prj', 'cpg', 'sbx', 'sbn', 'qpj'].includes(
         getFileExtension(file)
       )
     ) {
@@ -98,7 +98,7 @@ export function simpleStyleToLeafletStyle(feature: Feature): PathOptions {
     'stroke-width': 'weight',
     fill: 'fillColor',
     'fill-opacity': 'fillOpacity',
-  } as const;
+  };
 
   const leafletPathOptions: PathOptions = {};
 

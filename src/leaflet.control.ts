@@ -1,7 +1,7 @@
 // @ts-ignore
 import './styles.css';
-import { Map, Util, DomUtil, DomEvent, Control, GeoJSON } from 'leaflet';
-import type { Layer } from 'leaflet';
+import type { Layer, Map } from 'leaflet';
+import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
 import type { Feature } from 'geojson';
 import {
   csvLoad,
@@ -16,38 +16,17 @@ import {
 } from './leaflet.omnivore.ts';
 import {
   bytesToKilobytes,
-  removeShpComponents,
   getFileBaseName,
   getFileExtension,
   isPropertyNameDisplayable,
   processShapeFiles,
+  removeShpComponents,
   simpleStyleToLeafletStyle,
 } from './utils.ts';
-import type {
-  FileNotSupportedEventHandler,
-  FileSizeLimitEventHandler,
-  LayerIsEmptyEventHandler,
-  LayerLoadedEventHandler,
-  LayerLoadErrorEventHandler,
-  BetterFileLayerControlOptions,
-} from './types.ts';
-
-declare module 'leaflet' {
-  interface Events {
-    on(type: 'bfl:layerloaded', fn: LayerLoadedEventHandler): this;
-
-    on(type: 'bfl:layerloaderror', fn: LayerLoadErrorEventHandler): this;
-
-    on(type: 'bfl:filenotsupported', fn: FileNotSupportedEventHandler): this;
-
-    on(type: 'bfl:layerisempty', fn: LayerIsEmptyEventHandler): this;
-
-    on(type: 'bfl:filesizelimit', fn: FileSizeLimitEventHandler): this;
-  }
-}
+import type { BetterFileLayerControlOptions } from './types.ts';
 
 export class BetterFileLayer extends Control {
-  declare options: Partial<BetterFileLayerControlOptions>;
+  declare options: BetterFileLayerControlOptions;
   defaultOpts: Readonly<BetterFileLayerControlOptions> = {
     position: 'topleft',
     fileSizeLimit: 10240,
@@ -110,12 +89,12 @@ export class BetterFileLayer extends Control {
 
   constructor(options?: Partial<BetterFileLayerControlOptions>) {
     super(options);
-    Util.setOptions(this, options || this.defaultOpts);
+    Util.setOptions(this, { ...this.defaultOpts, ...options });
   }
 
   onAdd(map: Map): HTMLDivElement {
     this._map = map;
-
+    console.log(this.options);
     /*
       Binding external button: Enable event listeners
       and return empty div because of Leaflet Control
@@ -136,12 +115,10 @@ export class BetterFileLayer extends Control {
     );
 
     const input = DomUtil.create('input', '', container);
-    input.title = this.options?.text?.title || this.defaultOpts.text.title;
+    input.title = this.options.text.title;
     input.type = 'file';
     input.multiple = true;
-    input.accept =
-      this.options?.extensions?.join(',') ||
-      this.defaultOpts.extensions.join(',');
+    input.accept = this.options.extensions.join(',');
 
     DomEvent.on(input, 'change', this._onFileUpload, this);
 
@@ -151,10 +128,6 @@ export class BetterFileLayer extends Control {
   }
 
   _enableDragAndDrop(): void {
-    if (!this._map) {
-      return;
-    }
-
     const mapContainer = this._map.getContainer();
 
     DomEvent.on(mapContainer, 'dragover', DomEvent.stop)
@@ -163,10 +136,6 @@ export class BetterFileLayer extends Control {
   }
 
   _disableDragAndDrop(): void {
-    if (!this._map) {
-      return;
-    }
-
     const mapContainer = this._map.getContainer();
 
     DomEvent.removeListener(mapContainer, 'dragover', DomEvent.stop)
@@ -199,6 +168,9 @@ export class BetterFileLayer extends Control {
   }
 
   _isFileTypeSupported(extension: string): boolean {
+    /**
+     * File types supported by Loaders.
+     */
     return [
       'geojson',
       'json',
@@ -215,10 +187,6 @@ export class BetterFileLayer extends Control {
 
   async _load(files: File[]): Promise<void> {
     if (!files.length) {
-      return;
-    }
-
-    if (!this._map) {
       return;
     }
 
@@ -247,10 +215,6 @@ export class BetterFileLayer extends Control {
         return;
       }
 
-      if (!this.options.fileSizeLimit) {
-        this.options.fileSizeLimit = this.defaultOpts.fileSizeLimit;
-      }
-
       if (bytesToKilobytes(file.size) > this.options.fileSizeLimit) {
         this._map.fire('bfl:filesizelimit', {
           fileName: fileName,
@@ -261,28 +225,11 @@ export class BetterFileLayer extends Control {
         continue;
       }
 
-      if (!this.options.style) {
-        this.options.style = this.defaultOpts.style;
-      }
-
-      if (!this.options.onEachFeature) {
-        this.options.onEachFeature = this.defaultOpts.onEachFeature;
-      }
-
-      if (!this.options.layer) {
-        this.options.layer = this.defaultOpts.layer;
-      }
-
-      this.options.layer.setStyle(this.options.style);
+      /*
+       * Prepare GeoJSON Layer
+       */
+      this.options.layer.options.style = this.options.style;
       this.options.layer.options.onEachFeature = this.options.onEachFeature;
-
-      if (!this.options.csvOptions) {
-        this.options.csvOptions = this.defaultOpts.csvOptions;
-      }
-
-      if (!this.options.polylineOptions) {
-        this.options.polylineOptions = this.defaultOpts.polylineOptions;
-      }
 
       try {
         if (fileExtension === 'csv') {
@@ -335,6 +282,9 @@ export class BetterFileLayer extends Control {
             layer: this.options.layer,
           });
         }
+        /*
+         * After processing shapefile components, they become zip files.
+         */
         if (fileExtension === 'zip') {
           this.options.layer = await shapefileLoad({
             file: file,
@@ -351,12 +301,9 @@ export class BetterFileLayer extends Control {
           continue;
         }
 
-        if (!this.options.addOnMap) {
-          this.options.addOnMap = this.defaultOpts.addOnMap;
-        }
-
         if (this.options.addOnMap) {
           this.options.layer.addTo(this._map);
+          this._map.fitBounds(this.options.layer.getBounds());
         }
 
         this._map.fire('bfl:layerloaded', {
@@ -383,11 +330,3 @@ export class BetterFileLayer extends Control {
     this._disableDragAndDrop();
   }
 }
-
-// Object.assign(Control, {
-//   BetterFileLayer: BetterFileLayer,
-// });
-//
-// Map.mergeOptions({
-//   betterFileLayerControl: false,
-// });

@@ -10,5 +10,5 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "include": ["src/index.ts"]
+  "include": ["src/types.ts"]
 }
