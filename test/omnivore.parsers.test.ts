@@ -58,6 +58,7 @@ test('Testing .TOPOJSON Parser', () => {
 test('Testing .CSV Parser | Without Options', () => {
   const parsedCsv = csvParse({
     data: readFileSync('./test/a.csv', 'utf-8'),
+    options: { latfield: 'lat', lonfield: 'lon', delimiter: ',' },
   });
 
   const expectedGeoJson = {
@@ -192,6 +193,7 @@ test('Testing .KMZ Parser', async () => {
 test('Testing .POLYLINE Parser', () => {
   const parsedPolyline = polylineParse({
     data: readFileSync('./test/a.polyline', 'utf-8'),
+    precision: 5,
   });
 
   const expectedGeoJson = {

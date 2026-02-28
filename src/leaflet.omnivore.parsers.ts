@@ -1,15 +1,24 @@
-import { csv2geojson } from 'csv2geojson';
-import { parse as wktParser } from 'wellknown';
+import { csv2geojson, CsvOptions } from 'csv2geojson';
+import { GeoJSONGeometry, parse as wktParser } from 'wellknown';
 import { decode as polylineParser } from '@mapbox/polyline';
 import { feature as topojsonParser } from 'topojson-client';
 import { gpx as gpxParser, kml as kmlParser } from '@mapbox/togeojson';
-import { parseZip as parseShpZip } from 'shpjs';
+import { FeatureCollectionWithFilename, parseZip as parseShpZip } from 'shpjs';
 import { loadAsync } from 'jszip';
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
 
 interface TextParserParameters {
   data: string;
-  options?: object;
+}
+
+interface CsvParserParameters {
+  data: string;
+  options: CsvOptions;
+}
+
+interface PolylineParserParameters {
+  data: string;
+  precision: number;
 }
 
 interface BinaryParserParameters {
@@ -34,6 +43,10 @@ export function topojsonParse({
 }: TextParserParameters): FeatureCollection | Feature | undefined {
   const topojson = JSON.parse(data);
 
+  if (!topojson) {
+    return;
+  }
+
   // For specific for TopoJson unpredictable weird structure.
   for (const object_type in topojson.objects) {
     const parsed: FeatureCollection | Feature = topojsonParser(
@@ -52,12 +65,10 @@ export function topojsonParse({
 export function csvParse({
   data,
   options,
-}: TextParserParameters): FeatureCollection | undefined {
-  options = options || {};
-
+}: CsvParserParameters): FeatureCollection | undefined {
   let features: FeatureCollection | undefined = undefined;
 
-  const afterParse = (err, geojson) => {
+  const afterParse = (err: unknown, geojson: FeatureCollection) => {
     if (err) {
       return;
     }
@@ -117,9 +128,9 @@ export async function kmzParse({
 
 export function polylineParse({
   data,
-  options,
-}: TextParserParameters): Feature | undefined {
-  const coords = polylineParser(data, { precision: options });
+  precision,
+}: PolylineParserParameters): Feature | undefined {
+  const coords = polylineParser(data, precision);
 
   const geom: Geometry = {
     type: 'LineString',
@@ -140,7 +151,7 @@ export function polylineParse({
 
 export function wktParse({
   data,
-}: TextParserParameters): FeatureCollection | undefined {
+}: TextParserParameters): GeoJSONGeometry | undefined {
   const parsed = wktParser(data);
 
   if (!parsed) {
@@ -152,7 +163,9 @@ export function wktParse({
 
 export async function shpParse({
   data,
-}: BinaryParserParameters): Promise<FeatureCollection | undefined> {
+}: BinaryParserParameters): Promise<
+  FeatureCollectionWithFilename | FeatureCollectionWithFilename[] | undefined
+> {
   const parsedData = await parseShpZip(data);
 
   if (!parsedData) {

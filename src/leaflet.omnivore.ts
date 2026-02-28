@@ -11,6 +11,7 @@ import {
   topojsonParse,
   wktParse,
 } from './leaflet.omnivore.parsers.ts';
+import { FeatureCollection } from 'geojson';
 
 interface LoaderParameters {
   file: File;
@@ -141,7 +142,12 @@ export async function wktLoad({ file, layer }: LoaderParameters) {
 export async function polylineLoad({ file, options, layer }: LoaderParameters) {
   const data = await file.text();
 
-  const parsedData = polylineParse({ data, options });
+  const precision: number = options?.precision;
+
+  const parsedData = polylineParse({
+    data,
+    precision: precision || 6,
+  });
 
   if (!parsedData) {
     throw Error('Cannot parse Polyline file.');
@@ -164,7 +170,7 @@ export async function shapefileLoad({ file, layer }: LoaderParameters) {
     throw Error('Cannot parse Shapefile file.');
   }
 
-  layer.addData(parsedData);
+  layer.addData(parsedData as FeatureCollection);
 
   return layer;
 }
