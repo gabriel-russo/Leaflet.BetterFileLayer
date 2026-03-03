@@ -20,7 +20,7 @@
     "./dist/leaflet.betterfilelayer.css": "./dist/leaflet.betterfilelayer.css"
   },
   "scripts": {
-    "dev": "vite build --watch",
+    "dev": "vite --port 3000",
     "test": "jest",
     "declaration": "tsc -p tsconfig.declaration.ts",
     "build": "vite build && npm run declaration",

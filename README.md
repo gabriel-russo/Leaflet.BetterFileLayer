@@ -123,7 +123,7 @@ Start Vite development mode
 npm run dev
 ```
 
-Open `index.html` in your browser and start editing.
+Open `localhost:3000` in your browser and start editing `index.html`.
 
 ### Test
 
