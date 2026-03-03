@@ -28,9 +28,9 @@ import {
 } from '../src/leaflet.omnivore.parsers';
 
 test('Testing .TOPOJSON Parser', () => {
-  const parsedTopojson = topojsonParse(
-    readFileSync('./test/a.topojson', 'utf-8')
-  );
+  const parsedTopojson = topojsonParse({
+    data: readFileSync('./test/a.topojson', 'utf-8'),
+  });
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -56,7 +56,10 @@ test('Testing .TOPOJSON Parser', () => {
 });
 
 test('Testing .CSV Parser | Without Options', () => {
-  const parsedCsv = csvParse(readFileSync('./test/a.csv', 'utf-8'), {});
+  const parsedCsv = csvParse({
+    data: readFileSync('./test/a.csv', 'utf-8'),
+    options: { latfield: 'lat', lonfield: 'lon', delimiter: ',' },
+  });
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -84,7 +87,10 @@ test('Testing .CSV Parser | With Options', () => {
     lonfield: 'long',
   };
 
-  const parsedCsv = csvParse(readFileSync('./test/b.csv', 'utf-8'), options);
+  const parsedCsv = csvParse({
+    data: readFileSync('./test/b.csv', 'utf-8'),
+    options: options,
+  });
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -106,7 +112,7 @@ test('Testing .CSV Parser | With Options', () => {
 });
 
 test('Testing .GPX Parser', () => {
-  const parsedGpx = gpxParse(readFileSync('./test/a.gpx', 'utf-8'));
+  const parsedGpx = gpxParse({ data: readFileSync('./test/a.gpx', 'utf-8') });
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -130,7 +136,7 @@ test('Testing .GPX Parser', () => {
 });
 
 test('Testing .KML Parser', () => {
-  const parsedKml = kmlParse(readFileSync('./test/a.kml', 'utf-8'));
+  const parsedKml = kmlParse({ data: readFileSync('./test/a.kml', 'utf-8') });
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -157,7 +163,8 @@ test('Testing .KML Parser', () => {
 });
 
 test('Testing .KMZ Parser', async () => {
-  const parsedKml = await kmzParse(readFileSync('./test/a.kmz'));
+  // @ts-ignore
+  const parsedKml = await kmzParse({ data: readFileSync('./test/a.kmz') });
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -184,10 +191,10 @@ test('Testing .KMZ Parser', async () => {
 });
 
 test('Testing .POLYLINE Parser', () => {
-  const parsedPolyline = polylineParse(
-    readFileSync('./test/a.polyline', 'utf-8'),
-    {}
-  );
+  const parsedPolyline = polylineParse({
+    data: readFileSync('./test/a.polyline', 'utf-8'),
+    precision: 5,
+  });
 
   const expectedGeoJson = {
     type: 'Feature',
@@ -206,7 +213,7 @@ test('Testing .POLYLINE Parser', () => {
 });
 
 test('Testing .WKT Parser', () => {
-  const parsedWkt = wktParse(readFileSync('./test/a.wkt', 'utf-8'));
+  const parsedWkt = wktParse({ data: readFileSync('./test/a.wkt', 'utf-8') });
 
   const expectedGeoJson = {
     type: 'MultiPoint',

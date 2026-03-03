@@ -1,13 +1,23 @@
+import type {
+  Control,
+  ControlOptions,
+  ControlPosition,
+  GeoJSON,
+  Layer,
+  Map,
+  PathOptions,
+} from 'leaflet';
+import type { Feature } from 'geojson';
+
 /*
- Event Handlers
-*/
+ * EVENT HANDLERS
+ */
 
-import * as L from 'leaflet';
-import { Feature } from 'geojson';
-
-export type LayerLoadedEventHandler = (e: {
-  layer: L.GeoJSON;
-  id: string;
+/*
+ * File Layer loaded successfully
+ */
+type LayerLoadedEventHandler = (e: {
+  layer: GeoJSON;
   fileName: string;
   fileExtension: string;
   fileSize: number;
@@ -16,37 +26,87 @@ export type LayerLoadedEventHandler = (e: {
   fileUploadDate: Date;
 }) => void;
 
-export type LayerLoadErrorEventHandler = (e: {
+/*
+ * File Layer failed to load
+ */
+type LayerLoadErrorEventHandler = (e: {
   fileName: string;
   fileExtension: string;
   exception: Error;
   message: string;
 }) => void;
 
-export type FileNotSupportedEventHandler = (e: {
+/*
+ * File extension is not supported
+ */
+type FileNotSupportedEventHandler = (e: {
   fileName: string;
   fileExtension: string;
   supportedExtensions: string[];
 }) => void;
 
-export type LayerIsEmptyEventHandler = (e: {
+/*
+ * Layer loaded successfully but has 0 (zero) features to show.
+ */
+type LayerIsEmptyEventHandler = (e: {
   fileName: string;
   fileExtension: string;
   fileSize: number;
 }) => void;
 
-export type FileSizeLimitEventHandler = (e: {
+/*
+ * File size is bigger than the limit permitted
+ */
+type FileSizeLimitEventHandler = (e: {
   fileName: string;
   fileExtension: string;
   fileSize: number;
   maxFileSize: number;
 }) => void;
 
-/*
-  CONTROL
-*/
+// redeclare module, maintains compatibility with @types/leaflet
+declare module 'leaflet' {
+  /**
+   * Extends built in leaflet Layer Options.
+   */
+  interface Evented {
+    on(
+      type: 'bfl:layerloaded',
+      fn: LayerLoadedEventHandler,
+      context?: never
+    ): this;
 
-export type SupportedExtensions =
+    on(
+      type: 'bfl:layerloaderror',
+      fn: LayerLoadErrorEventHandler,
+      context?: never
+    ): this;
+
+    on(
+      type: 'bfl:filenotsupported',
+      fn: FileNotSupportedEventHandler,
+      context?: never
+    ): this;
+
+    on(
+      type: 'bfl:layerisempty',
+      fn: LayerIsEmptyEventHandler,
+      context?: never
+    ): this;
+
+    on(
+      type: 'bfl:filesizelimit',
+      fn: FileSizeLimitEventHandler,
+      context?: never
+    ): this;
+  }
+}
+
+/*
+ * Better File Layer Control types
+ */
+
+type SupportedExtensions =
   | '.geojson'
   | '.json'
   | '.kml'
@@ -60,19 +120,83 @@ export type SupportedExtensions =
   | '.shp'
   | '.shx'
   | '.dbf'
-  | '.prj';
+  | '.prj'
+  | '.cpg';
 
-export interface BetterFileLayerControlOptions extends L.ControlOptions {
-  position?: L.ControlPosition;
-  fileSizeLimit?: number;
-  style?: (feature: Feature) => L.PathOptions;
-  onEachFeature?: (feature: Feature, layer: L.Layer) => void;
-  layer?: L.GeoJSON;
-  extensions?: SupportedExtensions[];
-  importOptions?: Record<string, object>;
-  text?: {
+export interface BetterFileLayerControlOptions extends ControlOptions {
+  /**
+   * Control position.
+   */
+  position: ControlPosition;
+  /**
+   * Maximum file size in kilobytes.
+   */
+  fileSizeLimit: number;
+  /**
+   * Function used with GeoJSON. See Leaflet docs.
+   */
+  style: (feature: Feature) => PathOptions;
+  /**
+   * Function used with GeoJSON. See Leaflet docs.
+   */
+  onEachFeature: (feature: Feature, layer: Layer) => void;
+  /**
+   * Layer used to Load the data. Custom Layers must be Type of GeoJSON.
+   */
+  layer: GeoJSON;
+  /**
+   * Supported extensions by HTML File Input.
+   */
+  extensions: SupportedExtensions[];
+  /**
+   * CSV options. See csv2geojson to see options.
+   */
+  csvOptions: {
+    delimiter: string;
+    latfield: string;
+    lonfield: string;
+  };
+  /**
+   * Polyline options. See @mapbox/polyline to see options.
+   */
+  polylineOptions: {
+    precision: number;
+  };
+  /**
+   * Control button text.
+   */
+  text: {
     title: string;
   };
-  will_bind_button_later?: boolean;
-  button?: HTMLElement | HTMLInputElement;
+  /**
+   * Custom External button. Must be input element of type file.
+   */
+  button?: HTMLInputElement;
+  /**
+   * Enable or disable layer autoload. If true the plugin will
+   * create the layer, add into map and send it via bfl:layerloaded event.
+   * If false the plugin will only create the layer and send it via event.
+   */
+  addOnMap: boolean;
+}
+
+/*
+ * Main Control class
+ */
+export declare class BetterFileLayer extends Control {
+  public constructor(options?: Partial<BetterFileLayerControlOptions>);
+
+  public onAdd(map: Map): HTMLDivElement;
+
+  private _enableDragAndDrop(): void;
+
+  private _disableDragAndDrop(): void;
+
+  private _onDragAndDrop(): void;
+
+  private _onFileUpload(e: Event): void;
+
+  private _load(files: File[]): Promise<void>;
+
+  public onRemove(): void;
 }

@@ -1,5 +1,8 @@
-import * as L from 'leaflet';
-import { Feature } from 'geojson';
+// @ts-ignore
+import './styles.css';
+import type { Layer, Map } from 'leaflet';
+import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
+import type { Feature } from 'geojson';
 import {
   csvLoad,
   geojsonLoad,
@@ -10,28 +13,54 @@ import {
   shapefileLoad,
   topojsonLoad,
   wktLoad,
-} from './leaflet.omnivore';
+} from './leaflet.omnivore.ts';
 import {
   bytesToKilobytes,
-  filterShpComponents,
   getFileBaseName,
   getFileExtension,
   isPropertyNameDisplayable,
   processShapeFiles,
+  removeShpComponents,
   simpleStyleToLeafletStyle,
-} from './utils';
-import { BetterFileLayerControlOptions } from './types';
+} from './utils.ts';
+import type { BetterFileLayerControlOptions } from './types.ts';
 
-export class BetterFileLayer extends L.Control {
-  options: BetterFileLayerControlOptions = {
+export class BetterFileLayer extends Control {
+  declare options: BetterFileLayerControlOptions;
+  defaultOpts: Readonly<BetterFileLayerControlOptions> = {
     position: 'topleft',
-    fileSizeLimit: 1024,
-    importOptions: {
-      csv: {
-        delimiter: ',',
-        latfield: 'lat',
-        lonfield: 'lon',
-      },
+    fileSizeLimit: 10240,
+    layer: new GeoJSON(),
+    csvOptions: {
+      delimiter: ',',
+      latfield: 'lat',
+      lonfield: 'lon',
+    },
+    polylineOptions: {
+      precision: 6,
+    },
+    style: simpleStyleToLeafletStyle,
+    onEachFeature: (feature: Feature, layer: Layer) => {
+      if (!feature.properties) {
+        return;
+      }
+
+      const rows = Object.keys(feature.properties).map((key) => {
+        if (isPropertyNameDisplayable(key)) {
+          return `<span><b>${key}</b> : ${feature?.properties?.[key] || ''}</span>`;
+        }
+      });
+
+      layer.bindPopup(
+        `
+            <div style="display:flex;flex-direction:column;gap:5px"> 
+                ${rows.join('')}
+            </div>
+            `,
+        {
+          maxHeight: 240,
+        }
+      );
     },
     extensions: [
       '.geojson',
@@ -48,93 +77,69 @@ export class BetterFileLayer extends L.Control {
       '.shx',
       '.dbf',
       '.prj',
+      '.cpg',
     ],
     text: {
       title: 'Import a layer',
     },
-    will_bind_button_later: false,
+    addOnMap: true,
   };
 
-  private _map: L.Map | undefined;
+  private _map: Map;
 
   constructor(options?: Partial<BetterFileLayerControlOptions>) {
     super(options);
-    L.Util.setOptions(this, options || {});
+    Util.setOptions(this, { ...this.defaultOpts, ...options });
   }
 
-  onAdd(map: L.Map): HTMLDivElement {
+  onAdd(map: Map): HTMLDivElement {
     this._map = map;
 
-    // For React, Angular... users that handles conditional render
-    if (this.options.will_bind_button_later) {
-      return L.DomUtil.create('div');
-    }
-
+    /*
+      Binding external button: Enable event listeners
+      and return empty div because of Leaflet Control
+      instance rules.
+     */
     if (this.options.button) {
-      L.DomEvent.addListener(
-        this.options.button,
-        'change',
-        this._onFileUpload,
-        this
-      );
+      DomEvent.on(this.options.button, 'change', this._onFileUpload, this);
       this._enableDragAndDrop();
-      return L.DomUtil.create('div');
+      return DomUtil.create('div');
     }
 
-    const container = L.DomUtil.create('div', 'leaflet-control');
-    const inputContainer = L.DomUtil.create(
+    /*
+     * Better File Layer default control creation.
+     */
+    const container = DomUtil.create(
       'div',
-      'leaflet-control-better-filelayer',
-      container
+      'leaflet-control leaflet-control-better-filelayer'
     );
-    const input = L.DomUtil.create('input', '', inputContainer);
 
+    const input = DomUtil.create('input', '', container);
     input.title = this.options.text.title;
     input.type = 'file';
     input.multiple = true;
     input.accept = this.options.extensions.join(',');
 
-    L.DomEvent.addListener(input, 'change', this._onFileUpload, this);
+    DomEvent.on(input, 'change', this._onFileUpload, this);
 
     this._enableDragAndDrop();
 
     return container;
   }
 
-  bind_button(ref: HTMLInputElement): void {
-    L.DomEvent.addListener(ref, 'change', this._onFileUpload, this);
-    this._enableDragAndDrop();
-  }
-
   _enableDragAndDrop(): void {
-    if (!this._map) {
-      return;
-    }
-
     const mapContainer = this._map.getContainer();
 
-    L.DomEvent.addListener(mapContainer, 'dragover', L.DomEvent.stopPropagation)
-      .addListener(mapContainer, 'dragover', L.DomEvent.preventDefault)
-      .addListener(mapContainer, 'drop', L.DomEvent.stopPropagation)
-      .addListener(mapContainer, 'drop', L.DomEvent.preventDefault)
-      .addListener(mapContainer, 'drop', this._onDragAndDrop, this);
+    DomEvent.on(mapContainer, 'dragover', DomEvent.stop)
+      .on(mapContainer, 'drop', DomEvent.stop)
+      .on(mapContainer, 'drop', this._onDragAndDrop, this);
   }
 
   _disableDragAndDrop(): void {
-    if (!this._map) {
-      return;
-    }
-
     const mapContainer = this._map.getContainer();
 
-    L.DomEvent.removeListener(
-      mapContainer,
-      'dragover',
-      L.DomEvent.stopPropagation
-    )
-      .removeListener(mapContainer, 'dragover', L.DomEvent.preventDefault)
-      .removeListener(mapContainer, 'drop', L.DomEvent.stopPropagation)
-      .removeListener(mapContainer, 'drop', L.DomEvent.preventDefault)
+    DomEvent.removeListener(mapContainer, 'dragover', DomEvent.stop)
+      .removeListener(mapContainer, 'drop', DomEvent.stop)
       .removeListener(mapContainer, 'drop', this._onDragAndDrop, this);
   }
 
@@ -162,27 +167,28 @@ export class BetterFileLayer extends L.Control {
     this._load(files);
   }
 
+  _isFileTypeSupported(extension: string): boolean {
+    /**
+     * File types supported by Loaders.
+     */
+    return [
+      'geojson',
+      'json',
+      'kml',
+      'wkt',
+      'gpx',
+      'topojson',
+      'csv',
+      'polyline',
+      'zip',
+      'kmz',
+    ].includes(extension);
+  }
+
   async _load(files: File[]): Promise<void> {
     if (!files.length) {
       return;
     }
-
-    if (!this._map) {
-      return;
-    }
-
-    const fileLoaders: Record<string, CallableFunction> = {
-      geojson: geojsonLoad,
-      json: geojsonLoad,
-      kml: kmlLoad,
-      kmz: kmzLoad,
-      csv: csvLoad,
-      wkt: wktLoad,
-      gpx: gpxLoad,
-      topojson: topojsonLoad,
-      polyline: polylineLoad,
-      zip: shapefileLoad,
-    };
 
     /* Pre-processing:
       - Search for shapefile components (.shp, .shx, .prj, .dbf) and group by file name
@@ -193,16 +199,14 @@ export class BetterFileLayer extends L.Control {
     const shpZips = await processShapeFiles(files);
 
     if (shpZips.length) {
-      files = [...filterShpComponents(files), ...shpZips];
+      files = [...removeShpComponents(files), ...shpZips];
     }
 
     for (const file of files) {
       const fileName = getFileBaseName(file);
       const fileExtension = getFileExtension(file);
 
-      const loader = fileLoaders[fileExtension] || null;
-
-      if (!loader) {
+      if (!this._isFileTypeSupported(fileExtension)) {
         this._map.fire('bfl:filenotsupported', {
           fileName: file.name,
           fileExtension: fileExtension,
@@ -221,75 +225,89 @@ export class BetterFileLayer extends L.Control {
         continue;
       }
 
-      const parserOptions = this.options.importOptions[fileExtension] || {};
-
-      // Creating some metadata to layer.
-      const layerOptions = {
-        name: fileName,
-        id: L.Util.stamp({}).toString(),
-        style: (feat: Feature) => {
-          // Some softwares that generates KML, use simplestyle-spec as style exporter.
-          const featStyle = simpleStyleToLeafletStyle(feat);
-
-          if (!featStyle) {
-            return;
-          }
-
-          return featStyle as L.PathOptions;
-        },
-        onEachFeature: (feature: Feature, layer: L.Layer) => {
-          if (!feature.properties) {
-            return;
-          }
-
-          const rows = Object.keys(feature.properties).map((key) => {
-            if (isPropertyNameDisplayable(key)) {
-              // @ts-ignore
-              return `<span><b>${key}</b> : ${feature.properties[key]}</span>`;
-            }
-          });
-
-          layer.bindPopup(
-            `
-            <div style="display:flex;flex-direction:column;gap:5px"> 
-                ${rows.join('')}
-            </div>
-            `,
-            {
-              maxHeight: 240,
-            }
-          );
-        },
-      };
-
-      if (this.options.style) {
-        layerOptions.style = this.options.style;
-      }
-
-      if (this.options.onEachFeature) {
-        layerOptions.onEachFeature = this.options.onEachFeature;
-      }
-
-      const options = { parserOptions, layerOptions };
+      /*
+       * Prepare GeoJSON Layer
+       */
+      this.options.layer.options.style = this.options.style;
+      this.options.layer.options.onEachFeature = this.options.onEachFeature;
 
       try {
-        const layer = await loader(file, options, this.options.layer || null);
+        if (fileExtension === 'csv') {
+          this.options.layer = await csvLoad({
+            file: file,
+            options: this.options.csvOptions,
+            layer: this.options.layer,
+          });
+        }
+        if (fileExtension === 'polyline') {
+          this.options.layer = await polylineLoad({
+            file: file,
+            options: this.options.polylineOptions,
+            layer: this.options.layer,
+          });
+        }
+        if (['geojson', 'json'].includes(fileExtension)) {
+          this.options.layer = await geojsonLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
+        if (fileExtension === 'kml') {
+          this.options.layer = await kmlLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
+        if (fileExtension === 'kmz') {
+          this.options.layer = await kmzLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
+        if (fileExtension === 'wkt') {
+          this.options.layer = await wktLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
+        if (fileExtension === 'gpx') {
+          this.options.layer = await gpxLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
+        if (fileExtension === 'topojson') {
+          this.options.layer = await topojsonLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
+        /*
+         * After processing shapefile components, they become zip files.
+         */
+        if (fileExtension === 'zip') {
+          this.options.layer = await shapefileLoad({
+            file: file,
+            layer: this.options.layer,
+          });
+        }
 
-        if (!layer.getLayers().length) {
+        if (!this.options.layer.getLayers().length) {
           this._map.fire('bfl:layerisempty', {
             fileName: fileName,
             fileExtension: fileExtension,
             fileSize: bytesToKilobytes(file.size),
           });
-
           continue;
         }
 
-        const addedLayer = layer.addTo(this._map);
+        if (this.options.addOnMap) {
+          this.options.layer.addTo(this._map);
+          this._map.fitBounds(this.options.layer.getBounds());
+        }
 
         this._map.fire('bfl:layerloaded', {
-          layer: addedLayer,
-          id: layerOptions.id,
+          layer: this.options.layer,
           fileName: fileName,
           fileExtension: fileExtension,
           fileSize: bytesToKilobytes(file.size),
@@ -311,10 +329,4 @@ export class BetterFileLayer extends L.Control {
   onRemove() {
     this._disableDragAndDrop();
   }
-}
-
-export function betterFileLayer(
-  options?: Partial<BetterFileLayerControlOptions>
-) {
-  return new BetterFileLayer(options);
 }

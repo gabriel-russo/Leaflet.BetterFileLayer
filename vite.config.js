@@ -1,25 +1,26 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 
-// https://vite.dev/guide/build.html#library-mode
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
   build: {
     lib: {
-      entry: 'src/index.ts',
-      name: 'leaflet-better-filelayer',
-      formats: ['es', 'umd'],
+      entry: resolve(__dirname, 'src/leaflet.control.ts'),
+      name: 'leaflet.betterfilelayer',
+      formats: ['es'],
       cssFileName: 'leaflet.betterfilelayer',
-      fileName: (format) =>
-        ({
-          es: `leaflet.betterfilelayer.modern.js`,
-          umd: `leaflet.betterfilelayer.js`,
-        })[format],
+      fileName: () => 'leaflet.betterfilelayer.js',
     },
+    cssMinify: true,
     sourcemap: true,
+    minify: 'terser',
     rollupOptions: {
       external: ['leaflet'],
       output: {
         globals: {
-          leaflet: 'L',
+          leaflet: 'leaflet',
         },
       },
     },

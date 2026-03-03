@@ -1,30 +1,29 @@
 {
   "name": "leaflet-better-filelayer",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Load spatialized files into leaflet using the HTML FileReader API",
   "files": [
     "dist"
   ],
-  "main": "dist/leaflet.betterfilelayer.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/leaflet.betterfilelayer.js",
+  "module": "./dist/leaflet.betterfilelayer.js",
+  "types": "./dist/types.d.ts",
+  "styles": "./dist/leaflet.betterfilelayer.css",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/leaflet.betterfilelayer.modern.js"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/leaflet.betterfilelayer.cjs"
-      }
+      "types": "./dist/types.d.ts",
+      "import": "./dist/leaflet.betterfilelayer.js",
+      "require": "./dist/leaflet.betterfilelayer.js",
+      "default": "./dist/leaflet.betterfilelayer.js"
     },
-    "./dist/leaflet.betterfilelayer.css": "./dist/leaflet.betterfilelayer.css",
-    "./leaflet.betterfilelayer.css": "./dist/leaflet.betterfilelayer.css",
-    "./styles.css": "./dist/leaflet.betterfilelayer.css"
+    "./dist/leaflet.betterfilelayer.css": "./dist/leaflet.betterfilelayer.css"
   },
   "scripts": {
+    "dev": "vite --port 3000",
     "test": "jest",
-    "build": "vite build && tsc --target ES2022 --declaration --emitDeclarationOnly --skipLibCheck --outDir dist/ src/index.ts",
+    "declaration": "tsc -p tsconfig.declaration.ts",
+    "build": "vite build && npm run declaration",
     "pack": "npm run build && npm pack",
     "lint": "eslint src/",
     "style": "prettier --write \"src/**/*.{ts,js,css}\" --log-level=warn"
@@ -58,6 +57,9 @@
     "url": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer/issues"
   },
   "homepage": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer",
+  "peerDependencies": {
+    "leaflet": ">=2.0.0-alpha.1"
+  },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
     "@mapbox/togeojson": "^0.16.2",
@@ -65,24 +67,29 @@
     "buffer": "^6.0.3",
     "csv2geojson": "^5.1.2",
     "jszip": "^3.10.1",
-    "shpjs": "^6.1.0",
+    "shpjs": "^6.2.0",
     "topojson-client": "^3.1.0",
     "wellknown": "^0.5.0"
   },
   "devDependencies": {
-    "@jest/globals": "^30.0.5",
+    "@eslint/js": "^10.0.1",
+    "@jest/globals": "^30.2.0",
     "@types/geojson": "^7946.0.16",
     "@types/jest": "^30.0.0",
-    "@types/leaflet": "^1.9.20",
-    "eslint": "^9.32.0",
-    "jest": "^30.0.5",
-    "jest-fixed-jsdom": "^0.0.9",
-    "leaflet": "^1.9.4",
-    "prettier": "^3.6.2",
-    "ts-jest": "^29.4.0",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.38.0",
-    "vite": "^7.0.6"
+    "@types/leaflet": "^1.9.21",
+    "@types/mapbox__polyline": "^1.0.5",
+    "@types/shpjs": "^3.4.7",
+    "@types/topojson-client": "^3.1.5",
+    "@types/wellknown": "^0.5.8",
+    "eslint": "^10.0.2",
+    "jest": "^30.2.0",
+    "jest-fixed-jsdom": "^0.0.11",
+    "prettier": "^3.8.1",
+    "terser": "^5.46.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "vite": "^7.3.1"
   },
   "prettier": {
     "trailingComma": "es5",

@@ -1,30 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Dev - Leaflet Better File Layer</title>
+  <meta charset="UTF-8">
+  <title>Dev - Leaflet Better File Layer</title>
 
-    <!-- Dependency to Leaflet -->
-    <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
-    <script type="text/javascript" src="node_modules/leaflet/dist/leaflet-src.js"></script>
+  <!-- Dependency to Leaflet -->
+  <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css"/>
 
-    <!-- Files from current project -->
-    <link rel="stylesheet" href="dist/leaflet.betterfilelayer.css">
-    <script type="text/javascript" src="dist/leaflet.betterfilelayer.js"></script>
+  <!-- Files from current project -->
+  <link rel="stylesheet" href="./dist/leaflet.betterfilelayer.css">
 </head>
+
+<style>
+  #map {
+    width: 100vw;
+    height: 100vh;
+  }
+</style>
+
 <body>
-<div id="map" style="width: 98vw; height: 85vh"></div>
+<div id="map"></div>
 </body>
-<script>
-  const osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; 2013 OpenStreetMap contributors',
+<script type="importmap">
+  {
+      "imports": {
+          "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
+          "leaflet-better-filelayer": "./dist/leaflet.betterfilelayer.js"
+      }
+  }
+</script>
+<script type="module">
+  import {Map, TileLayer} from 'leaflet';
+  import {BetterFileLayer} from "leaflet-better-filelayer";
+
+  const tiles = new TileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   });
 
-  const map = L.map('map')
-    .setView([-8.748008188078693, -63.88549804687501], 13)
-    .addLayer(osm);
+  const bfl = new BetterFileLayer({position: "topleft"});
 
-  map.on("bfl:layerloaded", (ev) => {
+  const map = new Map('map')
+    .setView([-8.748008188078693, -63.88549804687501], 13)
+    .addLayer(tiles)
+    .addControl(bfl);
+
+  map.on("filelayerloaded", (e) => {
     console.log(ev);
     map.fitBounds(ev.layer.getBounds());
   });
@@ -33,7 +54,60 @@
     console.log(ev);
   });
 
-  L.Control.betterFileLayer()
-    .addTo(map);
 </script>
+<style>
+  /* http://meyerweb.com/eric/tools/css/reset/
+  v2.0 | 20110126
+  License: none (public domain)
+  */
+  html, body, div, span, applet, object, iframe,
+  h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+  a, abbr, acronym, address, big, cite, code,
+  del, dfn, em, img, ins, kbd, q, s, samp,
+  small, strike, strong, sub, sup, tt, var,
+  b, u, i, center,
+  dl, dt, dd, ol, ul, li,
+  fieldset, form, label, legend,
+  table, caption, tbody, tfoot, thead, tr, th, td,
+  article, aside, canvas, details, embed,
+  figure, figcaption, footer, header, hgroup,
+  menu, nav, output, ruby, section, summary,
+  time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+  }
+
+  /* HTML5 display-role reset for older browsers */
+  article, aside, details, figcaption, figure,
+  footer, header, hgroup, menu, nav, section {
+    display: block;
+  }
+
+  body {
+    line-height: 1;
+  }
+
+  ol, ul {
+    list-style: none;
+  }
+
+  blockquote, q {
+    quotes: none;
+  }
+
+  blockquote:before, blockquote:after,
+  q:before, q:after {
+    content: '';
+    content: none;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+  }
+</style>
 </html>

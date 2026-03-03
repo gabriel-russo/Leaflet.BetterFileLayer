@@ -1,21 +1,33 @@
-// @ts-ignore
-import { csv2geojson } from 'csv2geojson';
-// @ts-ignore
-import { parse as wktParser } from 'wellknown';
-// @ts-ignore
+import { csv2geojson, CsvOptions } from 'csv2geojson';
+import { GeoJSONGeometry, parse as wktParser } from 'wellknown';
 import { decode as polylineParser } from '@mapbox/polyline';
-// @ts-ignore
 import { feature as topojsonParser } from 'topojson-client';
-// @ts-ignore
 import { gpx as gpxParser, kml as kmlParser } from '@mapbox/togeojson';
-// @ts-ignore
-import { parseZip as parseShpZip } from 'shpjs';
-// @ts-ignore
+import { FeatureCollectionWithFilename, parseZip as parseShpZip } from 'shpjs';
 import { loadAsync } from 'jszip';
-import { parseXML } from './leaflet.omnivore.utils';
-import { Feature, FeatureCollection, Geometry } from 'geojson';
+import type { Feature, FeatureCollection, Geometry } from 'geojson';
 
-export function geojsonParse(data: string): FeatureCollection | undefined {
+interface TextParserParameters {
+  data: string;
+}
+
+interface CsvParserParameters {
+  data: string;
+  options: CsvOptions;
+}
+
+interface PolylineParserParameters {
+  data: string;
+  precision: number;
+}
+
+interface BinaryParserParameters {
+  data: ArrayBuffer;
+}
+
+export function geojsonParse({
+  data,
+}: TextParserParameters): FeatureCollection | undefined {
   const geojson: FeatureCollection | undefined = JSON.parse(data);
 
   if (!geojson) {
@@ -25,10 +37,14 @@ export function geojsonParse(data: string): FeatureCollection | undefined {
   return geojson;
 }
 
-export function topojsonParse(
-  data: string
-): FeatureCollection | Feature | undefined {
+export function topojsonParse({
+  data,
+}: TextParserParameters): FeatureCollection | Feature | undefined {
   const topojson = JSON.parse(data);
+
+  if (!topojson) {
+    return;
+  }
 
   // For specific for TopoJson unpredictable weird structure.
   for (const object_type in topojson.objects) {
@@ -45,12 +61,13 @@ export function topojsonParse(
   }
 }
 
-export function csvParse(data: string, options): FeatureCollection | undefined {
-  options = options || {};
-
+export function csvParse({
+  data,
+  options,
+}: CsvParserParameters): FeatureCollection | undefined {
   let features: FeatureCollection | undefined = undefined;
 
-  const afterParse = (err, geojson) => {
+  const afterParse = (err: unknown, geojson: FeatureCollection) => {
     if (err) {
       return;
     }
@@ -62,7 +79,16 @@ export function csvParse(data: string, options): FeatureCollection | undefined {
   return features;
 }
 
-export function gpxParse(data: string): FeatureCollection | undefined {
+/**
+ * Parse a XML string like to XML
+ */
+export function parseXML(str: string): XMLDocument {
+  return new DOMParser().parseFromString(str, 'text/xml');
+}
+
+export function gpxParse({
+  data,
+}: TextParserParameters): FeatureCollection | undefined {
   const xml = parseXML(data);
 
   if (!xml) {
@@ -72,7 +98,9 @@ export function gpxParse(data: string): FeatureCollection | undefined {
   return gpxParser(xml);
 }
 
-export function kmlParse(data: string): FeatureCollection | undefined {
+export function kmlParse({
+  data,
+}: TextParserParameters): FeatureCollection | undefined {
   const xml = parseXML(data);
 
   if (!xml) {
@@ -82,25 +110,26 @@ export function kmlParse(data: string): FeatureCollection | undefined {
   return kmlParser(xml);
 }
 
-export async function kmzParse(
-  data: ArrayBuffer
-): Promise<FeatureCollection | undefined> {
+export async function kmzParse({
+  data,
+}: BinaryParserParameters): Promise<FeatureCollection | undefined> {
   const { files } = await loadAsync(data);
 
   for (const file in files) {
     if (file.endsWith('.kml')) {
-      const xml = await files[file].async('text');
-      return kmlParse(xml);
+      const data = await files[file].async('text');
+      return kmlParse({ data });
     }
   }
 
   return;
 }
 
-export function polylineParse(data: string, options): Feature | undefined {
-  options = options || {};
-
-  const coords = polylineParser(data, options.precision);
+export function polylineParse({
+  data,
+  precision,
+}: PolylineParserParameters): Feature | undefined {
+  const coords = polylineParser(data, precision);
 
   const geom: Geometry = {
     type: 'LineString',
@@ -119,8 +148,10 @@ export function polylineParse(data: string, options): Feature | undefined {
   return { type: 'Feature', geometry: geom } as Feature;
 }
 
-export function wktParse(wkt: string): FeatureCollection | undefined {
-  const parsed = wktParser(wkt);
+export function wktParse({
+  data,
+}: TextParserParameters): GeoJSONGeometry | undefined {
+  const parsed = wktParser(data);
 
   if (!parsed) {
     return;
@@ -129,9 +160,11 @@ export function wktParse(wkt: string): FeatureCollection | undefined {
   return parsed;
 }
 
-export async function shpParse(
-  data: ArrayBuffer
-): Promise<FeatureCollection | undefined> {
+export async function shpParse({
+  data,
+}: BinaryParserParameters): Promise<
+  FeatureCollectionWithFilename | FeatureCollectionWithFilename[] | undefined
+> {
   const parsedData = await parseShpZip(data);
 
   if (!parsedData) {

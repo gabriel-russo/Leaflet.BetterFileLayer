@@ -1,28 +1,23 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": [
-      "ES2022",
-      "DOM"
-    ],
-    "skipLibCheck": true,
+    "useDefineForClassFields": true,
+
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
+    "verbatimModuleSyntax": false,
     "noEmit": true,
+
     /* Linting */
     "strict": false,
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
+    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
-  },
-  "include": [
-    "src"
-  ]
+  }
 }
