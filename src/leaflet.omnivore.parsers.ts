@@ -23,7 +23,6 @@ interface PolylineParserParameters {
 
 interface BinaryParserParameters {
   data: ArrayBuffer;
-  options?: object;
 }
 
 export function geojsonParse({

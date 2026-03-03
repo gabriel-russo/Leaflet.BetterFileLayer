@@ -94,7 +94,7 @@ export class BetterFileLayer extends Control {
 
   onAdd(map: Map): HTMLDivElement {
     this._map = map;
-    console.log(this.options);
+
     /*
       Binding external button: Enable event listeners
       and return empty div because of Leaflet Control

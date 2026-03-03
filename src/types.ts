@@ -168,9 +168,14 @@ export interface BetterFileLayerControlOptions extends ControlOptions {
   text: {
     title: string;
   };
-  button?: HTMLElement | HTMLInputElement;
   /**
-   * Enable autoload.
+   * Custom External button. Must be input element of type file.
+   */
+  button?: HTMLInputElement;
+  /**
+   * Enable or disable layer autoload. If true the plugin will
+   * create the layer, add into map and send it via bfl:layerloaded event.
+   * If false the plugin will only create the layer and send it via event.
    */
   addOnMap: boolean;
 }

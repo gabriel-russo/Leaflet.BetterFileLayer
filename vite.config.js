@@ -11,11 +11,11 @@ export default defineConfig({
       name: 'leaflet.betterfilelayer',
       formats: ['es'],
       cssFileName: 'leaflet.betterfilelayer',
-      minify: true,
-      sourcemap: true,
       fileName: () => 'leaflet.betterfilelayer.js',
     },
+    cssMinify: true,
     sourcemap: true,
+    minify: 'terser',
     rollupOptions: {
       external: ['leaflet'],
       output: {
