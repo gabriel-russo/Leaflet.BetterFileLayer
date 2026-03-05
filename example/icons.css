@@ -1,0 +1,25 @@
+.folder-pois-icon {
+  display: inline-block;
+  background-image: url("./folder-pois.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.github-icon {
+  display: inline-block;
+  background-image: url("./github.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.icon--medium {
+  width: 2rem;
+  height: 2rem;
+}
+
+.icon--small {
+  width: 1.5rem;
+  height: 1.5rem;
+}
