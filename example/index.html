@@ -1,76 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Leaflet.BetterFileLayer</title>
-    <!-- LEAFLET SOURCE    -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
-          integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
-            integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <meta charset="UTF-8">
+  <title>Leaflet.BetterFileLayer</title>
 
-    <!-- Leaflet BetterFileLayer -->
-    <script type="application/javascript"
-            src="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.js"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.css"
-          crossorigin="anonymous" referrerpolicy="no-referrer">
+  <!-- Code -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="common.css">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <!-- Leaflet Better FileLayer -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@2.0.0/dist/leaflet.betterfilelayer.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
-
-<style>
-    html {
-        font-family: Helvetica, sans-serif;
-    }
-
-    .plugin-title {
-        display: flex;
-        flex-direction: row;
-        align-content: center;
-        margin: 10px;
-    }
-
-    .plugin-title span {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-right: 35px;
-    }
-
-    .plugin-title a {
-        text-align: center;
-        align-self: center;
-        text-decoration: none;
-    }
-</style>
-
 <body>
-<div class="plugin-title">
-    <span>Leaflet.BetterFileLayer</span>
-    <a href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">github.com/gabriel-russo/Leaflet.BetterFileLayer</a>
-</div>
-<div id="map" style="width: 98vw; height: 85vh"></div>
-<div style="margin-top: 10px"><a href="with-button.html">Example with external html input</a></div>
+<header class="header">
+  <h1 class="header__title">
+    <div class="folder-pois-icon icon--medium"></div>
+    Leaflet Better FileLayer
+  </h1>
+  <nav class="nav">
+    <a class="nav__link" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki">[Wiki]</a>
+    <a class="nav__link" href="https://npmjs.com/package/leaflet-better-filelayer">[NPM]</a>
+    <a class="nav__link nav__link--mobile" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">
+      <div class="github-icon icon--small"></div>
+    </a>
+  </nav>
+</header>
+<main class="container">
+  <div class="events">
+    <p class="events__title">Event Log</p>
+    <p class="events__type">Event Type: <span id="type"></span></p>
+    <div class="events__output">
+      <pre><code id="output"></code></pre>
+    </div>
+  </div>
+  <div id="map" class="map"></div>
+</main>
+<footer class="footer">
+  <p class="footer__text">
+    Created by <a class="footer__text--link" href="https://github.com/gabriel-russo">Gabriel Russo</a>
+  </p>
+</footer>
 </body>
+<script type="importmap">
+  {
+      "imports": {
+          "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
+          "leaflet-better-filelayer": "https://unpkg.com/leaflet-better-filelayer@2.0.0/dist/leaflet.betterfilelayer.js"
+      }
+  }
+</script>
+<script type="module">
+  import {Map, TileLayer} from 'leaflet';
+  import {BetterFileLayer} from "leaflet-better-filelayer";
 
-<script type="text/javascript">
-  const wi = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  const tiles = new TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   });
 
-  const map = L.map('map')
-    .setView([-15.798654271090207, -47.86738872528077], 4)
-    .addLayer(wi);
+  const bfl = new BetterFileLayer({position: "topleft"});
 
-  // 10MB file size Limit
-  L.control.betterFileLayer({ fileSizeLimit: 10485760 })
-    .addTo(map);
+  const map = new Map('map').setView([-8.748008188078693, -63.88549804687501], 13);
 
-  map.on("bfl:layerloaded", (ev) => {
-    console.log(ev);
-    map.fitBounds(ev.layer.getBounds());
+  map.addLayer(tiles)
+
+  map.addControl(bfl);
+
+  const event_type = document.getElementById("type");
+
+  const event_output = document.getElementById("output");
+
+  map.on("bfl:layerloaded", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
+
+    map.fitBounds(layer.getBounds());
+  });
+
+  map.on("bfl:layerloaderror", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText = JSON.stringify(data, undefined, 2);
+  });
+
+  map.on("bfl:filenotsupported", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText = JSON.stringify(data, undefined, 2);
+  });
+
+  map.on("bfl:layerisempty", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText = JSON.stringify(data, undefined, 2);
+  });
+
+  map.on("bfl:filesizelimit", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText = JSON.stringify(data, undefined, 2);
   });
 
 </script>
-
 </html>
