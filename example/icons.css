@@ -1,17 +1,20 @@
-.folder-pois-icon {
+.icon {
   display: inline-block;
-  background-image: url("./folder-pois.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
-.github-icon {
-  display: inline-block;
+.icon--folder-pois {
+  background-image: url("./folder-pois.svg");
+}
+
+.icon--github {
   background-image: url("./github.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
+}
+
+.icon--upload {
+  background-image: url("./layer-upload.svg");
 }
 
 .icon--medium {

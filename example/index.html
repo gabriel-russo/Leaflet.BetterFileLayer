@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="common.css">
+  <link rel="stylesheet" href="main.css">
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css"
@@ -21,18 +21,19 @@
 <body>
 <header class="header">
   <h1 class="header__title">
-    <div class="folder-pois-icon icon--medium"></div>
+    <div class="icon icon--folder-pois icon--medium"></div>
     Leaflet Better FileLayer
   </h1>
   <nav class="nav">
-    <a class="nav__link" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki">[Wiki]</a>
-    <a class="nav__link" href="https://npmjs.com/package/leaflet-better-filelayer">[NPM]</a>
-    <a class="nav__link nav__link--mobile" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">
-      <div class="github-icon icon--small"></div>
+    <a class="link u-hide-mobile" href="with-button.html">[Demo external button]</a>
+    <a class="link u-hide-mobile" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki">[Wiki]</a>
+    <a class="link u-hide-mobile" href="https://npmjs.com/package/leaflet-better-filelayer">[NPM]</a>
+    <a class="link" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">
+      <div class="icon icon--github icon--small"></div>
     </a>
   </nav>
 </header>
-<main class="container">
+<main class="u-relative-container">
   <div class="events">
     <p class="events__title">Event Log</p>
     <p class="events__type">Event Type: <span id="type"></span></p>
@@ -42,9 +43,9 @@
   </div>
   <div id="map" class="map"></div>
 </main>
-<footer class="footer">
+<footer class="footer u-hide-mobile">
   <p class="footer__text">
-    Created by <a class="footer__text--link" href="https://github.com/gabriel-russo">Gabriel Russo</a>
+    Created by <a class="link" href="https://github.com/gabriel-russo">Gabriel Russo</a>
   </p>
 </footer>
 </body>
@@ -65,7 +66,7 @@
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   });
 
-  const bfl = new BetterFileLayer({position: "topleft"});
+  const bfl = new BetterFileLayer({position: "topleft",  fileSizeLimit: 1024 * 20});
 
   const map = new Map('map').setView([-8.748008188078693, -63.88549804687501], 13);
 
@@ -94,7 +95,7 @@
 
     event_type.innerText = data.type;
 
-    event_output.innerText = JSON.stringify(data, undefined, 2);
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
   });
 
   map.on("bfl:filenotsupported", (e) => {
@@ -103,7 +104,7 @@
 
     event_type.innerText = data.type;
 
-    event_output.innerText = JSON.stringify(data, undefined, 2);
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
   });
 
   map.on("bfl:layerisempty", (e) => {
@@ -112,7 +113,7 @@
 
     event_type.innerText = data.type;
 
-    event_output.innerText = JSON.stringify(data, undefined, 2);
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
   });
 
   map.on("bfl:filesizelimit", (e) => {
@@ -121,7 +122,7 @@
 
     event_type.innerText = data.type;
 
-    event_output.innerText = JSON.stringify(data, undefined, 2);
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
   });
 
 </script>

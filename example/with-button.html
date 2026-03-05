@@ -1,115 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Leaflet.BetterFileLayer</title>
-    <!-- LEAFLET SOURCE    -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
-          integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"
-            integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <meta charset="UTF-8">
+  <title>Leaflet.BetterFileLayer</title>
 
-    <!-- Leaflet BetterFileLayer DEVELOPMENT -->
-    <!--    <link rel="stylesheet" href="../dist/leaflet.betterfilelayer.css">-->
-    <!--    <script type="text/javascript" src="../dist/leaflet.betterfilelayer.js"></script>-->
+  <!-- Code -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="main.css">
 
-    <!-- Leaflet BetterFileLayer -->
-    <script type="application/javascript"
-            src="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.js"
-            crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@1.0.1/dist/leaflet.betterfilelayer.css"
-          crossorigin="anonymous" referrerpolicy="no-referrer">
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+  <!-- Leaflet Better FileLayer -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-better-filelayer@2.0.0/dist/leaflet.betterfilelayer.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer">
 </head>
-
-<style>
-    html {
-        font-family: Helvetica, sans-serif;
-    }
-
-    .row-stack {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .plugin-title {
-        display: flex;
-        flex-direction: column;
-        align-content: center;
-        margin: 10px;
-        gap: 5px
-    }
-
-    .plugin-title span {
-        font-size: 2rem;
-        font-weight: bold;
-        margin-right: 35px;
-    }
-
-    .plugin-title a {
-        text-align: center;
-        align-self: flex-start;
-        text-decoration: none;
-    }
-
-    .plugin-title .control-panel {
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 10px;
-        margin-top: 20px;
-        gap: 5px;
-    }
-
-    .plugin-title .control-panel p {
-        font-size: 1.2rem;
-        align-self: center;
-        margin: 0;
-    }
-
-</style>
-
-<body class="row-stack">
-<div class="plugin-title">
-    <span>Leaflet.BetterFileLayer</span>
-    <a href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">github.com/gabriel-russo/Leaflet.BetterFileLayer</a>
-    <div class="control-panel">
-        <p>Control Panel</p>
-        <input type="file" id="input-btn" multiple
-               accept=".gpx,.kml,.geojson,.json,.csv,.topojson,.wkt,.shp,.shx,.prj,.dbf,.zip"/>
+<body>
+<header class="header">
+  <h1 class="header__title">
+    <div class="icon icon--folder-pois icon--medium"></div>
+    Leaflet Better FileLayer
+  </h1>
+  <nav class="nav">
+    <a class="link u-hide-mobile" href="index.html">[Leaflet control demo]</a>
+    <a class="link u-hide-mobile" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer/wiki">[Wiki]</a>
+    <a class="link u-hide-mobile" href="https://npmjs.com/package/leaflet-better-filelayer">[NPM]</a>
+    <a class="link" href="https://github.com/gabriel-russo/Leaflet.BetterFileLayer">
+      <div class="icon icon--github icon--small"></div>
+    </a>
+  </nav>
+</header>
+<main class="u-relative-container">
+  <div id="map" class="map"></div>
+  <div class="external-button">
+    <p class="external-button__title u-hide-mobile">Control from external button</p>
+    <button class="icon-button">
+      <div class="icon icon--upload icon--small"></div>
+      <span class="icon-button__text u-hide-mobile">Upload File</span>
+      <input type="file" class="icon-button__input" multiple id="input"/>
+    </button>
+  </div>
+  <div class="events">
+    <p class="events__title">Event Log</p>
+    <p class="events__type">Event Type: <span id="type"></span></p>
+    <div class="events__output">
+      <pre><code id="output"></code></pre>
     </div>
-</div>
-<div id="map" style="width: 60vw; height: 90vh"></div>
+  </div>
+</main>
+<footer class="footer u-hide-mobile">
+  <p class="footer__text">
+    Created by <a class="link" href="https://github.com/gabriel-russo">Gabriel Russo</a>
+  </p>
+</footer>
 </body>
+<script type="importmap">
+  {
+      "imports": {
+          "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha.1/dist/leaflet.js",
+          "leaflet-better-filelayer": "https://unpkg.com/leaflet-better-filelayer@2.0.0/dist/leaflet.betterfilelayer.js"
+      }
+  }
+</script>
+<script type="module">
+  import {Map, TileLayer} from 'leaflet';
+  import {BetterFileLayer} from "leaflet-better-filelayer";
 
-<script type="text/javascript">
-  const osm = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: 'Map data &copy; 2013 OpenStreetMap contributors',
+  const tiles = new TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 19,
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   });
 
-  const map = L.map('map')
-    .setView([-23.70078702319699, -46.69719607766831], 16)
-    .addLayer(osm);
+  const input = document.getElementById("input");
 
-  const options = {
-    button: document.getElementById("input-btn"),
-    fileSizeLimit: 10485760 // 10MB
-  };
+  const bfl = new BetterFileLayer({position: "topleft", button: input, fileSizeLimit: 1024 * 20});
 
-  L.control.betterFileLayer(options)
-    .addTo(map);
+  const map = new Map('map').setView([-8.748008188078693, -63.88549804687501], 13);
 
-  map.on("bfl:layerloaded", (ev) => {
-    console.log(ev);
-    map.fitBounds(ev.layer.getBounds());
+  map.addLayer(tiles)
+
+  map.addControl(bfl);
+
+  const event_type = document.getElementById("type");
+
+  const event_output = document.getElementById("output");
+
+  map.on("bfl:layerloaded", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
+
+    map.fitBounds(layer.getBounds());
+  });
+
+  map.on("bfl:layerloaderror", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
+  });
+
+  map.on("bfl:filenotsupported", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
+  });
+
+  map.on("bfl:layerisempty", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
+  });
+
+  map.on("bfl:filesizelimit", (e) => {
+    // Removing unwanted properties
+    const {layer, target, sourceTarget, ...data} = e;
+
+    event_type.innerText = data.type;
+
+    event_output.innerText += JSON.stringify(data, undefined, 2) + "\n\n";
   });
 
 </script>
-
 </html>

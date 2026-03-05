@@ -1,0 +1,26 @@
+.u-hide-mobile {
+  display: none;
+}
+
+.u-hide-desktop {
+  display: inline-block;
+}
+
+.u-relative-container {
+  position: relative;
+  flex: 1 1 0;
+}
+
+@media screen and (min-width: 769px) {
+  .u-hide-mobile {
+    display: inline-block;
+  }
+
+  .u-hide-desktop {
+    display: none;
+  }
+
+  .u-relative-container {
+    padding: 2rem var(--padding-sides);
+  }
+}
