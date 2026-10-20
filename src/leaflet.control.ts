@@ -1,3 +1,4 @@
+import './styles.css';
 import type { Layer, Map } from 'leaflet';
 import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
 import type { Feature } from 'geojson';
