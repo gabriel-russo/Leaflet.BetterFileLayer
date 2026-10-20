@@ -1,4 +1,3 @@
-import JSZip from 'jszip';
 import type { Feature } from 'geojson';
 import type { PathOptions } from 'leaflet';
 
@@ -13,7 +12,10 @@ export function getFileExtension(file: File): string {
  * Returns the filename without extension
  */
 export function getFileBaseName(file: File): string {
-  return file.name.split('.').at(0) as string;
+  const name = file.name;
+  const dotIndex = name.lastIndexOf('.');
+
+  return dotIndex > 0 ? name.slice(0, dotIndex) : name;
 }
 
 /**
@@ -21,70 +23,6 @@ export function getFileBaseName(file: File): string {
  */
 export function bytesToKilobytes(value: number): number {
   return value / 1024;
-}
-
-/**
- * Group the shapefile components (shp, dbf, prj...) by filename and returns an object where the
- * keys are the filename and the value is a list with the shapefile components associated
- */
-export async function processShapeFiles(files: File[]): Promise<File[]> {
-  const shpComponents: Record<string, File[]> = {};
-  const zips: File[] = [];
-
-  for (const file of files) {
-    const extension = getFileExtension(file);
-
-    const fileName = getFileBaseName(file);
-
-    if (['shp', 'shx', 'dbf', 'prj'].includes(extension)) {
-      if (!(fileName in shpComponents)) {
-        shpComponents[fileName] = [];
-      }
-
-      shpComponents[fileName].push(file);
-    }
-  }
-
-  if (!Object.keys(shpComponents).length) {
-    return [];
-  }
-
-  for (const fileName in shpComponents) {
-    const zip = new JSZip();
-
-    for (const component of shpComponents[fileName]) {
-      zip.file(component.name, await component.arrayBuffer());
-    }
-
-    const blob = await zip.generateAsync({ type: 'blob' });
-
-    const shpZip: File = new File([blob], `${fileName}.zip`, {
-      type: 'application/zip',
-    });
-
-    zips.push(shpZip);
-  }
-
-  return zips;
-}
-
-/*
- * Remove all files that are part of a shapefile's components (shp, dbf, prj...)
- */
-export function removeShpComponents(files: File[]): File[] {
-  const filteredFiles: File[] = [];
-
-  for (const file of files) {
-    if (
-      !['shp', 'shx', 'dbf', 'prj', 'cpg', 'sbx', 'sbn', 'qpj'].includes(
-        getFileExtension(file)
-      )
-    ) {
-      filteredFiles.push(file);
-    }
-  }
-
-  return filteredFiles;
 }
 
 /*
@@ -131,4 +69,18 @@ export function isPropertyNameDisplayable(prop: string): boolean {
   ];
 
   return !blackList.includes(prop);
+}
+
+export function buildPopupContent(feature: Feature): string {
+  const properties = feature.properties;
+
+  if (!properties) return '';
+
+  const rows = Object.keys(properties)
+    .filter(isPropertyNameDisplayable)
+    .map((key) => `<span><b>${key}</b> : ${properties[key] || ''}</span>`);
+
+  return rows.length
+    ? `<div style="display:flex;flex-direction:column;gap:5px">${rows.join('')}</div>`
+    : '';
 }

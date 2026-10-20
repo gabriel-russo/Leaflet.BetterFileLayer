@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/leaflet.control.ts'),
+      entry: resolve(__dirname, 'src/index.ts'),
       name: 'leaflet.betterfilelayer',
       formats: ['es'],
       cssFileName: 'leaflet.betterfilelayer',
@@ -25,4 +25,5 @@ export default defineConfig({
       },
     },
   },
+  resolve: { alias: { '@/': resolve(__dirname, 'src') } },
 });
