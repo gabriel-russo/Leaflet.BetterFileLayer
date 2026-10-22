@@ -1,4 +1,4 @@
-import { BinaryFileFormat, type ParsedData } from './FileFormat.ts';
+import { BinaryFileFormat, type ParsedData } from './core.ts';
 import { kml as kmlParser } from '@mapbox/togeojson';
 import { loadAsync } from 'jszip';
 

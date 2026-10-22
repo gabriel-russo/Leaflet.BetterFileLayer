@@ -10,7 +10,7 @@ import { KmzFormat } from '@/formats/KmzFormat.ts';
 import { WktFormat } from '@/formats/WktFormat.ts';
 import { PolylineFormat } from '@/formats/PolylineFormat.ts';
 import { ShapefileFormat } from '@/formats/ShapefileFormat.ts';
-import { TextFileFormat, type ParsedData } from '@/formats/FileFormat';
+import { TextFileFormat, type ParsedData } from '@/formats/core.ts';
 import type { BetterFileLayerControlOptions } from '@/types';
 import type { FeatureCollection } from 'geojson';
 import type { GeoJSON } from 'leaflet';

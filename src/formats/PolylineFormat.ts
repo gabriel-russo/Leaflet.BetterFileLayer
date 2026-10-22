@@ -1,4 +1,4 @@
-import { ParsedData, TextFileFormat } from './FileFormat.ts';
+import { ParsedData, TextFileFormat } from './core.ts';
 import { decode as polylineDecoder } from '@mapbox/polyline';
 import { BetterFileLayerControlOptions } from '@/types.ts';
 import { Feature, Geometry } from 'geojson';
