@@ -1,4 +1,4 @@
-import { FileFormatRegistry } from './FileFormat';
+import { FileFormatRegistry } from './core.ts';
 import { GeoJsonFormat } from './GeoJson.ts';
 import { TopoJsonFormat } from './TopoJson.ts';
 import { CsvFormat } from './CsvFormat.ts';

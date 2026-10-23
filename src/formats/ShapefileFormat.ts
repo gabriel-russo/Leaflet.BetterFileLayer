@@ -1,4 +1,4 @@
-import { BinaryFileFormat, ParsedData } from './FileFormat.ts';
+import { BinaryFileFormat, ParsedData } from './core.ts';
 import { getFileBaseName, getFileExtension } from '@/utils.ts';
 import JSZip from 'jszip';
 import { parseZip as parseShapefileZip } from 'shpjs';

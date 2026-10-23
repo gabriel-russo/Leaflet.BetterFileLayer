@@ -1,5 +1,5 @@
 import { FeatureCollection } from 'geojson';
-import { ParsedData, TextFileFormat } from './FileFormat.ts';
+import { ParsedData, TextFileFormat } from './core.ts';
 
 /**
  * Load a [GeoJSON](http://geojson.org/) document.

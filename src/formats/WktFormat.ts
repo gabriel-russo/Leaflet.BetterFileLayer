@@ -1,4 +1,4 @@
-import { ParsedData, TextFileFormat } from './FileFormat.ts';
+import { ParsedData, TextFileFormat } from './core.ts';
 import { wktToGeoJSON } from 'betterknown';
 
 /**
