@@ -1,0 +1,28 @@
+name: Tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**.ts'
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [24.x, 26.x]
+
+    steps:
+      - uses: actions/checkout@v6.0.3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run test

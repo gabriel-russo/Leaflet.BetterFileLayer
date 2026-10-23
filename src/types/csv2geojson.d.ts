@@ -10,14 +10,10 @@ declare module 'csv2geojson' {
 
   type CsvCallback = (
     err: { type: string; message: string } | null,
-    data: FeatureCollection
+    data: FeatureCollection,
   ) => void;
 
-  function csv2geojson(
-    csv: string,
-    options: CsvOptions,
-    callback: CsvCallback
-  ): void;
+  function csv2geojson(csv: string, options: CsvOptions, callback: CsvCallback): void;
 
   function csv2geojson(csv: string, callback: CsvCallback): void;
 }

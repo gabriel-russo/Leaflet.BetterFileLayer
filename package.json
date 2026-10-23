@@ -21,12 +21,13 @@
   },
   "scripts": {
     "dev": "vite --port 3000",
-    "test": "jest",
-    "declaration": "tsc -p tsconfig.declaration.ts",
+    "dev-build": "vite build --watch",
+    "test": "vitest run",
+    "declaration": "tsc -p tsconfig.declaration.json",
     "build": "vite build && npm run declaration",
-    "pack": "npm run build && npm pack",
-    "lint": "eslint src/",
-    "style": "prettier --write \"src/**/*.{ts,js,css}\" --log-level=warn"
+    "pack": "npm run build && npm pack --pack-destination dist/",
+    "lint": "eslint src/ test/",
+    "style": "prettier --write \"{src,test}/**/*.{ts,js,css}\" --log-level=warn"
   },
   "repository": {
     "type": "git",
@@ -58,43 +59,33 @@
   },
   "homepage": "https://github.com/gabriel-russo/Leaflet.BetterFileLayer",
   "peerDependencies": {
-    "leaflet": ">=2.0.0-alpha.1"
+    "leaflet": "^2.0.0-alpha.1"
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
     "@mapbox/togeojson": "^0.16.2",
+    "betterknown": "^1.2.0",
     "brfs": "^2.0.2",
     "buffer": "^6.0.3",
     "csv2geojson": "^5.1.2",
-    "jszip": "^3.10.1",
+    "jszip": "^3.10.2",
     "shpjs": "^6.2.0",
-    "topojson-client": "^3.1.0",
-    "wellknown": "^0.5.0"
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@jest/globals": "^30.2.0",
     "@types/geojson": "^7946.0.16",
-    "@types/jest": "^30.0.0",
-    "@types/leaflet": "^1.9.21",
+    "@types/leaflet": "^1.9.22",
     "@types/mapbox__polyline": "^1.0.5",
     "@types/shpjs": "^3.4.7",
     "@types/topojson-client": "^3.1.5",
-    "@types/wellknown": "^0.5.8",
-    "eslint": "^10.0.2",
-    "jest": "^30.2.0",
-    "jest-fixed-jsdom": "^0.0.11",
-    "prettier": "^3.8.1",
-    "terser": "^5.46.0",
-    "ts-jest": "^29.4.6",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1",
-    "vite": "^7.3.1"
-  },
-  "prettier": {
-    "trailingComma": "es5",
-    "tabWidth": 2,
-    "semi": true,
-    "singleQuote": true
+    "eslint": "^10.12.0",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.9.9",
+    "terser": "^5.51.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vite": "^8.3.3",
+    "vitest": "^4.1.11"
   }
 }

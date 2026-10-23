@@ -1,22 +1,30 @@
-import type {
-  Control,
-  ControlOptions,
-  ControlPosition,
-  GeoJSON,
-  Layer,
-  Map,
-  PathOptions,
-} from 'leaflet';
+import { Control } from 'leaflet';
+import type { Map, ControlOptions, ControlPosition, GeoJSON, Layer, PathOptions } from 'leaflet';
 import type { Feature } from 'geojson';
 
 /*
- * EVENT HANDLERS
+ * EVENT NAMES
+ */
+
+/**
+ * Every event fired by the plugin on the map instance.
+ */
+export const BFL_EVENTS = {
+  layerLoaded: 'bfl:layerloaded',
+  layerLoadError: 'bfl:layerloaderror',
+  fileNotSupported: 'bfl:filenotsupported',
+  layerIsEmpty: 'bfl:layerisempty',
+  fileSizeLimit: 'bfl:filesizelimit',
+} as const;
+
+/*
+ * EVENT PAYLOADS
  */
 
 /*
  * File Layer loaded successfully
  */
-type LayerLoadedEventHandler = (e: {
+export interface LayerLoadedEvent {
   layer: GeoJSON;
   fileName: string;
   fileExtension: string;
@@ -24,45 +32,70 @@ type LayerLoadedEventHandler = (e: {
   fileType: string;
   fileLastModified: Date;
   fileUploadDate: Date;
-}) => void;
+}
 
 /*
  * File Layer failed to load
  */
-type LayerLoadErrorEventHandler = (e: {
+export interface LayerLoadErrorEvent {
   fileName: string;
   fileExtension: string;
   exception: Error;
   message: string;
-}) => void;
+}
 
 /*
  * File extension is not supported
  */
-type FileNotSupportedEventHandler = (e: {
+export interface FileNotSupportedEvent {
   fileName: string;
   fileExtension: string;
   supportedExtensions: string[];
-}) => void;
+}
 
 /*
  * Layer loaded successfully but has 0 (zero) features to show.
  */
-type LayerIsEmptyEventHandler = (e: {
+export interface LayerIsEmptyEvent {
   fileName: string;
   fileExtension: string;
   fileSize: number;
-}) => void;
+}
 
 /*
  * File size is bigger than the limit permitted
  */
-type FileSizeLimitEventHandler = (e: {
+export interface FileSizeLimitEvent {
   fileName: string;
   fileExtension: string;
   fileSize: number;
   maxFileSize: number;
-}) => void;
+}
+
+/**
+ * Maps every event name to its payload. Keeps names and payloads in sync.
+ */
+export interface BflEventPayloads {
+  'bfl:layerloaded': LayerLoadedEvent;
+  'bfl:layerloaderror': LayerLoadErrorEvent;
+  'bfl:filenotsupported': FileNotSupportedEvent;
+  'bfl:layerisempty': LayerIsEmptyEvent;
+  'bfl:filesizelimit': FileSizeLimitEvent;
+}
+
+/*
+ * EVENT HANDLERS
+ */
+
+type LayerLoadedEventHandler = (e: LayerLoadedEvent) => void;
+
+type LayerLoadErrorEventHandler = (e: LayerLoadErrorEvent) => void;
+
+type FileNotSupportedEventHandler = (e: FileNotSupportedEvent) => void;
+
+type LayerIsEmptyEventHandler = (e: LayerIsEmptyEvent) => void;
+
+type FileSizeLimitEventHandler = (e: FileSizeLimitEvent) => void;
 
 // redeclare module, maintains compatibility with @types/leaflet
 declare module 'leaflet' {
@@ -70,58 +103,21 @@ declare module 'leaflet' {
    * Extends built in leaflet Layer Options.
    */
   interface Evented {
-    on(
-      type: 'bfl:layerloaded',
-      fn: LayerLoadedEventHandler,
-      context?: never
-    ): this;
+    on(type: 'bfl:layerloaded', fn: LayerLoadedEventHandler, context?: never): this;
 
-    on(
-      type: 'bfl:layerloaderror',
-      fn: LayerLoadErrorEventHandler,
-      context?: never
-    ): this;
+    on(type: 'bfl:layerloaderror', fn: LayerLoadErrorEventHandler, context?: never): this;
 
-    on(
-      type: 'bfl:filenotsupported',
-      fn: FileNotSupportedEventHandler,
-      context?: never
-    ): this;
+    on(type: 'bfl:filenotsupported', fn: FileNotSupportedEventHandler, context?: never): this;
 
-    on(
-      type: 'bfl:layerisempty',
-      fn: LayerIsEmptyEventHandler,
-      context?: never
-    ): this;
+    on(type: 'bfl:layerisempty', fn: LayerIsEmptyEventHandler, context?: never): this;
 
-    on(
-      type: 'bfl:filesizelimit',
-      fn: FileSizeLimitEventHandler,
-      context?: never
-    ): this;
+    on(type: 'bfl:filesizelimit', fn: FileSizeLimitEventHandler, context?: never): this;
   }
 }
 
 /*
  * Better File Layer Control types
  */
-
-type SupportedExtensions =
-  | '.geojson'
-  | '.json'
-  | '.kml'
-  | '.kmz'
-  | '.csv'
-  | '.wkt'
-  | '.gpx'
-  | '.topojson'
-  | '.polyline'
-  | '.zip'
-  | '.shp'
-  | '.shx'
-  | '.dbf'
-  | '.prj'
-  | '.cpg';
 
 export interface BetterFileLayerControlOptions extends ControlOptions {
   /**
@@ -147,7 +143,7 @@ export interface BetterFileLayerControlOptions extends ControlOptions {
   /**
    * Supported extensions by HTML File Input.
    */
-  extensions: SupportedExtensions[];
+  extensions: string[];
   /**
    * CSV options. See csv2geojson to see options.
    */
@@ -184,9 +180,13 @@ export interface BetterFileLayerControlOptions extends ControlOptions {
  * Main Control class
  */
 export declare class BetterFileLayer extends Control {
+  private static defaults(extensions: string[]): BetterFileLayerControlOptions;
+
   public constructor(options?: Partial<BetterFileLayerControlOptions>);
 
   public onAdd(map: Map): HTMLDivElement;
+
+  public onRemove(): void;
 
   private _enableDragAndDrop(): void;
 
@@ -198,5 +198,7 @@ export declare class BetterFileLayer extends Control {
 
   private _load(files: File[]): Promise<void>;
 
-  public onRemove(): void;
+  private _prepareLayer(): void;
+
+  private _fire<K extends keyof BflEventPayloads>(event: K, payload: BflEventPayloads[K]): void;
 }
