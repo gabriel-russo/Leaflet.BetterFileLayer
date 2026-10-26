@@ -2,10 +2,11 @@
 
 ### Load your spatialized files into Leaflet the way it should be.
 
-![npm](https://img.shields.io/npm/v/leaflet-better-filelayer)
-![downloads](https://img.shields.io/npm/dm/leaflet-better-filelayer)
-![license](https://img.shields.io/npm/l/leaflet-better-filelayer)
-![GitHub Workflow Status](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/actions/workflows/testing.yml/badge.svg)
+[![npm](https://img.shields.io/npm/v/leaflet-better-filelayer)](https://www.npmjs.com/package/leaflet-better-filelayer)
+[![downloads](https://img.shields.io/npm/dm/leaflet-better-filelayer)](https://www.npmjs.com/package/leaflet-better-filelayer)
+[![license](https://img.shields.io/npm/l/leaflet-better-filelayer)](https://www.npmjs.com/package/leaflet-better-filelayer)
+![GitHub Workflow Status](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/actions/workflows/test.yml/badge.svg)
+![GitHub Workflow Status](https://github.com/gabriel-russo/Leaflet.BetterFileLayer/actions/workflows/publish.yml/badge.svg)
 
 ---
 
@@ -138,10 +139,6 @@ npm run test
 ```commandline
 npm run style && npm run lint
 ```
-
-## Contributors
-
-- Gabriel Russo <gabrielrusso@protonmail.com>
 
 ## License
 
