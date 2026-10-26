@@ -1,6 +1,6 @@
 {
   "name": "leaflet-better-filelayer",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Load spatialized files into leaflet using the HTML FileReader API",
   "files": [
     "dist"
@@ -26,7 +26,8 @@
     "declaration": "tsc -p tsconfig.declaration.json",
     "build": "vite build && npm run declaration",
     "pack": "npm run build && npm pack --pack-destination dist/",
-    "lint": "eslint src/ test/",
+    "lint": "oxlint --import-plugin --jsdoc-plugin --vitest-plugin --promise-plugin src/ test/",
+    "lint:fix": "oxlint --fix --import-plugin --jsdoc-plugin --vitest-plugin --promise-plugin src/ test/",
     "style": "prettier --write \"{src,test}/**/*.{ts,js,css}\" --log-level=warn"
   },
   "repository": {
@@ -79,13 +80,12 @@
     "@types/mapbox__polyline": "^1.0.5",
     "@types/shpjs": "^3.4.7",
     "@types/topojson-client": "^3.1.5",
-    "eslint": "^10.12.0",
     "jsdom": "^29.1.1",
-    "prettier": "^3.9.9",
+    "oxlint": "^1.89.0",
+    "prettier": "^3.9.10",
     "terser": "^5.51.2",
-    "typescript": "^6.0.3",
-    "typescript-eslint": "^8.71.1",
-    "vite": "^8.3.3",
-    "vitest": "^4.1.11"
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }

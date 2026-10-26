@@ -51,9 +51,7 @@ export class BetterFileLayer extends Control {
     this._map = map;
 
     /*
-      Binding external button: Enable event listeners
-      and return empty div because of Leaflet Control
-      instance rules.
+      Binding external button: Enable event listeners and return empty div because of Leaflet Control instance rules.
      */
     if (this.options.button) {
       DomEvent.on(this.options.button, 'change', this._onFileUpload, this);
@@ -106,11 +104,24 @@ export class BetterFileLayer extends Control {
     void this._load(Array.from(input.files));
   }
 
+  private _prepareLayer(): void {
+    /* setting the default behaviors of layer */
+    this.options.layer.options.style = this.options.style;
+    this.options.layer.options.onEachFeature = this.options.onEachFeature;
+  }
+
+  private _fire<K extends keyof BflEventPayloads>(event: K, payload: BflEventPayloads[K]): void {
+    this._map.fire(event, payload);
+  }
+
   async _load(files: File[]): Promise<void> {
     if (!files.length) return;
 
     let processed = files;
 
+    /* For every format, they can preprocess the file list based on their needs.
+     * Ex.: Shapefile removes the components (.shp, .dbf, ...) and compress them with Zip.
+     * */
     for (const format of this._formats.registry) {
       /* Process file list inplace */
       processed = await format.preprocess(processed);
@@ -143,6 +154,7 @@ export class BetterFileLayer extends Control {
       this._prepareLayer();
 
       try {
+        /* Parse and then load the data inside Leaflet GeoJSON Layer (this.options.layer) */
         await format.load({
           file,
           layer: this.options.layer,
@@ -183,15 +195,5 @@ export class BetterFileLayer extends Control {
         });
       }
     }
-  }
-
-  private _prepareLayer(): void {
-    /* setting the default behaviors of layer */
-    this.options.layer.options.style = this.options.style;
-    this.options.layer.options.onEachFeature = this.options.onEachFeature;
-  }
-
-  private _fire<K extends keyof BflEventPayloads>(event: K, payload: BflEventPayloads[K]): void {
-    this._map.fire(event, payload);
   }
 }

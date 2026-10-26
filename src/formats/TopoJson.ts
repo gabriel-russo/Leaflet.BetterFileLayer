@@ -1,4 +1,4 @@
-import { type ParsedData, TextFileFormat } from './FileFormat.ts';
+import { type ParsedData, TextFileFormat } from './core.ts';
 import { feature as topojsonFeature } from 'topojson-client';
 
 /**
