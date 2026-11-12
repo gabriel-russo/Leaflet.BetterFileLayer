@@ -1,4 +1,5 @@
 import { gpx as gpxParser } from '@mapbox/togeojson';
+
 import { ParsedData, TextFileFormat } from './core.ts';
 
 /**

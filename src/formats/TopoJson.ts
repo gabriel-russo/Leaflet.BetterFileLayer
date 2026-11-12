@@ -1,5 +1,6 @@
-import { type ParsedData, TextFileFormat } from './core.ts';
 import { feature as topojsonFeature } from 'topojson-client';
+
+import { type ParsedData, TextFileFormat } from './core.ts';
 
 /**
  * Load a [TopoJSON](https://github.com/mbostock/topojson) document.

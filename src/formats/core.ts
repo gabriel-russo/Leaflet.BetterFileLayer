@@ -1,5 +1,6 @@
 import type { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
 import type { GeoJSON } from 'leaflet';
+
 import type { BetterFileLayerControlOptions } from '../types';
 
 /**
@@ -84,7 +85,10 @@ export abstract class TextFileFormat extends FileFormat {
     return this.parseText(await file.text(), options);
   }
 
-  protected abstract parseText(text: string, options?: unknown): ParsedData | undefined;
+  protected abstract parseText(
+    text: string,
+    options?: unknown,
+  ): ParsedData | undefined;
 }
 
 /**
@@ -138,7 +142,8 @@ export class FileFormatRegistry {
 
     for (const format of this.list) {
       for (const extension of format.extensions) extensions.add(extension);
-      for (const extension of format.acceptExtensions) extensions.add(extension);
+      for (const extension of format.acceptExtensions)
+        extensions.add(extension);
     }
 
     return [...extensions].map((extension) => `.${extension}`);

@@ -1,4 +1,5 @@
 import { FeatureCollection } from 'geojson';
+
 import { ParsedData, TextFileFormat } from './core.ts';
 
 /**

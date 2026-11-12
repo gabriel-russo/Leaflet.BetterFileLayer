@@ -5,13 +5,12 @@ on:
   push:
     paths:
       - '**.ts'
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:

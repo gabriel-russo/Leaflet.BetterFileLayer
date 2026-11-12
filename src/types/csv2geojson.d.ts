@@ -13,7 +13,11 @@ declare module 'csv2geojson' {
     data: FeatureCollection,
   ) => void;
 
-  function csv2geojson(csv: string, options: CsvOptions, callback: CsvCallback): void;
+  function csv2geojson(
+    csv: string,
+    options: CsvOptions,
+    callback: CsvCallback,
+  ): void;
 
   function csv2geojson(csv: string, callback: CsvCallback): void;
 }

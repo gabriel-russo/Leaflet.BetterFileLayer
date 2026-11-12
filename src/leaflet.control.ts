@@ -1,8 +1,14 @@
 import './styles.css';
-import type { Layer, Map } from 'leaflet';
-import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
 import type { Feature } from 'geojson';
+import type { Layer, LeafletMap } from 'leaflet';
+import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
+
 import { createDefaultRegistry, type FileFormatRegistry } from './formats';
+import {
+  BFL_EVENTS,
+  type BetterFileLayerControlOptions,
+  type BflEventPayloads,
+} from './types';
 import {
   buildPopupContent,
   bytesToKilobytes,
@@ -10,14 +16,13 @@ import {
   getFileExtension,
   simpleStyleToLeafletStyle,
 } from './utils';
-import { BFL_EVENTS, type BetterFileLayerControlOptions, type BflEventPayloads } from './types';
 
 export type { BetterFileLayerControlOptions } from './types';
 
 export class BetterFileLayer extends Control {
+  /* Migration docs says to use "static defaultOptions", but here we are only declaring the existence and type. */
   declare options: BetterFileLayerControlOptions;
 
-  private _map: Map;
   private readonly _formats: FileFormatRegistry;
 
   private static defaults(extensions: string[]): BetterFileLayerControlOptions {
@@ -47,7 +52,7 @@ export class BetterFileLayer extends Control {
     });
   }
 
-  onAdd(map: Map): HTMLDivElement {
+  onAdd(map: LeafletMap): HTMLDivElement {
     this._map = map;
 
     /*
@@ -62,7 +67,10 @@ export class BetterFileLayer extends Control {
     /*
      * Better File Layer default control creation.
      */
-    const container = DomUtil.create('div', 'leaflet-control leaflet-control-better-filelayer');
+    const container = DomUtil.create(
+      'div',
+      'leaflet-control leaflet-control-better-filelayer',
+    );
     const input = DomUtil.create('input', '', container);
     input.title = this.options.text.title;
     input.type = 'file';
@@ -80,16 +88,16 @@ export class BetterFileLayer extends Control {
 
   _enableDragAndDrop(): void {
     const container = this._map.getContainer();
-    DomEvent.on(container, 'dragover', DomEvent.stop)
-      .on(container, 'drop', DomEvent.stop)
-      .on(container, 'drop', this._onDragAndDrop, this);
+    DomEvent.on(container, 'dragover', DomEvent.stop);
+    DomEvent.on(container, 'drop', DomEvent.stop);
+    DomEvent.on(container, 'drop', this._onDragAndDrop, this);
   }
 
   _disableDragAndDrop(): void {
     const container = this._map.getContainer();
-    DomEvent.off(container, 'dragover', DomEvent.stop)
-      .off(container, 'drop', DomEvent.stop)
-      .off(container, 'drop', this._onDragAndDrop, this);
+    DomEvent.off(container, 'dragover', DomEvent.stop);
+    DomEvent.off(container, 'drop', DomEvent.stop);
+    DomEvent.off(container, 'drop', this._onDragAndDrop, this);
   }
 
   _onDragAndDrop(e: Event): void {
@@ -110,7 +118,10 @@ export class BetterFileLayer extends Control {
     this.options.layer.options.onEachFeature = this.options.onEachFeature;
   }
 
-  private _fire<K extends keyof BflEventPayloads>(event: K, payload: BflEventPayloads[K]): void {
+  private _fire<K extends keyof BflEventPayloads>(
+    event: K,
+    payload: BflEventPayloads[K],
+  ): void {
     this._map.fire(event, payload);
   }
 

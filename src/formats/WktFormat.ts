@@ -1,5 +1,6 @@
-import { ParsedData, TextFileFormat } from './core.ts';
 import { wktToGeoJSON } from 'betterknown';
+
+import { ParsedData, TextFileFormat } from './core.ts';
 
 /**
  * Load a WKT (Well Known Text) string.

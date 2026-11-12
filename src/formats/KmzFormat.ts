@@ -1,6 +1,7 @@
-import { BinaryFileFormat, type ParsedData } from './core.ts';
 import { kml as kmlParser } from '@mapbox/togeojson';
 import { loadAsync } from 'jszip';
+
+import { BinaryFileFormat, type ParsedData } from './core.ts';
 
 /**
  * Load a KMZ (zipped KML) document.
@@ -9,7 +10,9 @@ export class KmzFormat extends BinaryFileFormat {
   readonly extensions = ['kmz'];
   readonly label = 'KMZ';
 
-  protected async parseBinary(data: ArrayBuffer): Promise<ParsedData | undefined> {
+  protected async parseBinary(
+    data: ArrayBuffer,
+  ): Promise<ParsedData | undefined> {
     const { files } = await loadAsync(data);
     const parser = new DOMParser();
 
