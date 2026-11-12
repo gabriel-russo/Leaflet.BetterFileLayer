@@ -1,19 +1,21 @@
-import { test, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
+
+import type { FeatureCollection } from 'geojson';
+import type { GeoJSON } from 'leaflet';
+import { test, expect } from 'vitest';
+
 import { createDefaultRegistry } from '@/formats';
-import { GeoJsonFormat } from '@/formats/GeoJson.ts';
-import { TopoJsonFormat } from '@/formats/TopoJson.ts';
+import { TextFileFormat, type ParsedData } from '@/formats/core.ts';
 import { CsvFormat } from '@/formats/CsvFormat.ts';
+import { GeoJsonFormat } from '@/formats/GeoJson.ts';
 import { GpxFormat } from '@/formats/GpxFormat.ts';
 import { KmlFormat } from '@/formats/KmlFormat.ts';
 import { KmzFormat } from '@/formats/KmzFormat.ts';
-import { WktFormat } from '@/formats/WktFormat.ts';
 import { PolylineFormat } from '@/formats/PolylineFormat.ts';
 import { ShapefileFormat } from '@/formats/ShapefileFormat.ts';
-import { TextFileFormat, type ParsedData } from '@/formats/FileFormat';
+import { TopoJsonFormat } from '@/formats/TopoJson.ts';
+import { WktFormat } from '@/formats/WktFormat.ts';
 import type { BetterFileLayerControlOptions } from '@/types';
-import type { FeatureCollection } from 'geojson';
-import type { GeoJSON } from 'leaflet';
 
 function file(path: string, name: string): File {
   return new File([readFileSync(path)], name);
@@ -74,11 +76,14 @@ test('Testing .TOPOJSON Parser', async () => {
 });
 
 test('Testing .CSV Parser | Without Options', async () => {
-  const parsedCsv = await new CsvFormat().parse(file('./test/fixtures/a.csv', 'a.csv'), {
-    latfield: 'lat',
-    lonfield: 'lon',
-    delimiter: ',',
-  });
+  const parsedCsv = await new CsvFormat().parse(
+    file('./test/fixtures/a.csv', 'a.csv'),
+    {
+      latfield: 'lat',
+      lonfield: 'lon',
+      delimiter: ',',
+    },
+  );
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -106,7 +111,10 @@ test('Testing .CSV Parser | With Options', async () => {
     lonfield: 'long',
   };
 
-  const parsedCsv = await new CsvFormat().parse(file('./test/fixtures/b.csv', 'b.csv'), options);
+  const parsedCsv = await new CsvFormat().parse(
+    file('./test/fixtures/b.csv', 'b.csv'),
+    options,
+  );
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -128,7 +136,9 @@ test('Testing .CSV Parser | With Options', async () => {
 });
 
 test('Testing .GPX Parser', async () => {
-  const parsedGpx = await new GpxFormat().parse(file('./test/fixtures/a.gpx', 'a.gpx'));
+  const parsedGpx = await new GpxFormat().parse(
+    file('./test/fixtures/a.gpx', 'a.gpx'),
+  );
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -152,7 +162,9 @@ test('Testing .GPX Parser', async () => {
 });
 
 test('Testing .KML Parser', async () => {
-  const parsedKml = await new KmlFormat().parse(file('./test/fixtures/a.kml', 'a.kml'));
+  const parsedKml = await new KmlFormat().parse(
+    file('./test/fixtures/a.kml', 'a.kml'),
+  );
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -179,7 +191,9 @@ test('Testing .KML Parser', async () => {
 });
 
 test('Testing .KMZ Parser', async () => {
-  const parsedKml = await new KmzFormat().parse(file('./test/fixtures/a.kmz', 'a.kmz'));
+  const parsedKml = await new KmzFormat().parse(
+    file('./test/fixtures/a.kmz', 'a.kmz'),
+  );
 
   const expectedGeoJson = {
     type: 'FeatureCollection',
@@ -230,7 +244,9 @@ test('Testing .POLYLINE Parser', async () => {
 });
 
 test('Testing .WKT Parser', async () => {
-  const parsedWkt = await new WktFormat().parse(file('./test/fixtures/a.wkt', 'a.wkt'));
+  const parsedWkt = await new WktFormat().parse(
+    file('./test/fixtures/a.wkt', 'a.wkt'),
+  );
 
   const expectedGeoJson = {
     type: 'MultiPoint',

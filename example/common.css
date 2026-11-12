@@ -10,13 +10,13 @@
 .icon-button {
   position: relative;
   display: flex;
-  gap: .5rem;
+  gap: 0.5rem;
   justify-content: center;
   align-items: center;
-  background-color: #278EE0;
+  background-color: #278ee0;
   color: #fff;
   border-style: none;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: 0.5em;
   overflow: hidden;
   z-index: 1;

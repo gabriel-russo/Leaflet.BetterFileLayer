@@ -1,5 +1,6 @@
-import { type ParsedData, TextFileFormat } from './FileFormat.ts';
 import { kml as kmlParser } from '@mapbox/togeojson';
+
+import { type ParsedData, TextFileFormat } from './core.ts';
 
 /**
  * Load a [KML](https://developers.google.com/kml/documentation/) document.

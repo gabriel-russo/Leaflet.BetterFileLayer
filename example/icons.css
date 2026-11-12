@@ -6,15 +6,15 @@
 }
 
 .icon--folder-pois {
-  background-image: url("./folder-pois.svg");
+  background-image: url('./folder-pois.svg');
 }
 
 .icon--github {
-  background-image: url("./github.svg");
+  background-image: url('./github.svg');
 }
 
 .icon--upload {
-  background-image: url("./layer-upload.svg");
+  background-image: url('./layer-upload.svg');
 }
 
 .icon--medium {

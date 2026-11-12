@@ -1,7 +1,9 @@
-import { ParsedData, TextFileFormat } from './FileFormat.ts';
 import { decode as polylineDecoder } from '@mapbox/polyline';
-import { BetterFileLayerControlOptions } from '@/types.ts';
 import { Feature, Geometry } from 'geojson';
+
+import { BetterFileLayerControlOptions } from '@/types.ts';
+
+import { ParsedData, TextFileFormat } from './core.ts';
 
 /**
  * Load an encoded polyline string.
@@ -15,7 +17,8 @@ export class PolylineFormat extends TextFileFormat {
   }
 
   protected parseText(text: string, options?: unknown): ParsedData | undefined {
-    const precision = (options as { precision?: number } | undefined)?.precision ?? 6;
+    const precision =
+      (options as { precision?: number } | undefined)?.precision ?? 6;
 
     const coords = polylineDecoder(text, precision);
 

@@ -1,7 +1,9 @@
-import { type ParsedData, TextFileFormat } from './FileFormat.ts';
 import { csv2geojson, type CsvOptions } from 'csv2geojson';
-import { BetterFileLayerControlOptions } from '@/types.ts';
 import { FeatureCollection } from 'geojson';
+
+import { BetterFileLayerControlOptions } from '@/types.ts';
+
+import { type ParsedData, TextFileFormat } from './core.ts';
 
 /**
  * Load a CSV document.

@@ -1,9 +1,20 @@
-import { BinaryFileFormat, ParsedData } from './FileFormat.ts';
-import { getFileBaseName, getFileExtension } from '@/utils.ts';
 import JSZip from 'jszip';
 import { parseZip as parseShapefileZip } from 'shpjs';
 
-const SHAPEFILE_COMPONENTS = ['shp', 'shx', 'dbf', 'prj', 'cpg', 'sbx', 'sbn', 'qpj'];
+import { getFileBaseName, getFileExtension } from '@/utils.ts';
+
+import { BinaryFileFormat, ParsedData } from './core.ts';
+
+const SHAPEFILE_COMPONENTS = [
+  'shp',
+  'shx',
+  'dbf',
+  'prj',
+  'cpg',
+  'sbx',
+  'sbn',
+  'qpj',
+];
 
 /**
  * Load a zipped shapefile. Separate components (.shp, .dbf, .shx, ...) are
@@ -21,7 +32,9 @@ export class ShapefileFormat extends BinaryFileFormat {
 
     if (!components.length) return files;
 
-    const others = files.filter((file) => !SHAPEFILE_COMPONENTS.includes(getFileExtension(file)));
+    const others = files.filter(
+      (file) => !SHAPEFILE_COMPONENTS.includes(getFileExtension(file)),
+    );
 
     const grouped: Record<string, File[]> = {};
 
@@ -46,13 +59,17 @@ export class ShapefileFormat extends BinaryFileFormat {
 
       const blob = await zip.generateAsync({ type: 'blob' });
 
-      zips.push(new File([blob], `${baseName}.zip`, { type: 'application/zip' }));
+      zips.push(
+        new File([blob], `${baseName}.zip`, { type: 'application/zip' }),
+      );
     }
 
     return [...others, ...zips];
   }
 
-  protected async parseBinary(data: ArrayBuffer): Promise<ParsedData | undefined> {
+  protected async parseBinary(
+    data: ArrayBuffer,
+  ): Promise<ParsedData | undefined> {
     return (await parseShapefileZip(data)) as ParsedData | undefined;
   }
 }

@@ -1,8 +1,14 @@
 import './styles.css';
-import type { Layer, Map } from 'leaflet';
-import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
 import type { Feature } from 'geojson';
+import type { Layer, LeafletMap } from 'leaflet';
+import { Control, DomEvent, DomUtil, GeoJSON, Util } from 'leaflet';
+
 import { createDefaultRegistry, type FileFormatRegistry } from './formats';
+import {
+  BFL_EVENTS,
+  type BetterFileLayerControlOptions,
+  type BflEventPayloads,
+} from './types';
 import {
   buildPopupContent,
   bytesToKilobytes,
@@ -10,14 +16,13 @@ import {
   getFileExtension,
   simpleStyleToLeafletStyle,
 } from './utils';
-import { BFL_EVENTS, type BetterFileLayerControlOptions, type BflEventPayloads } from './types';
 
 export type { BetterFileLayerControlOptions } from './types';
 
 export class BetterFileLayer extends Control {
+  /* Migration docs says to use "static defaultOptions", but here we are only declaring the existence and type. */
   declare options: BetterFileLayerControlOptions;
 
-  private _map: Map;
   private readonly _formats: FileFormatRegistry;
 
   private static defaults(extensions: string[]): BetterFileLayerControlOptions {
@@ -47,13 +52,11 @@ export class BetterFileLayer extends Control {
     });
   }
 
-  onAdd(map: Map): HTMLDivElement {
+  onAdd(map: LeafletMap): HTMLDivElement {
     this._map = map;
 
     /*
-      Binding external button: Enable event listeners
-      and return empty div because of Leaflet Control
-      instance rules.
+      Binding external button: Enable event listeners and return empty div because of Leaflet Control instance rules.
      */
     if (this.options.button) {
       DomEvent.on(this.options.button, 'change', this._onFileUpload, this);
@@ -64,7 +67,10 @@ export class BetterFileLayer extends Control {
     /*
      * Better File Layer default control creation.
      */
-    const container = DomUtil.create('div', 'leaflet-control leaflet-control-better-filelayer');
+    const container = DomUtil.create(
+      'div',
+      'leaflet-control leaflet-control-better-filelayer',
+    );
     const input = DomUtil.create('input', '', container);
     input.title = this.options.text.title;
     input.type = 'file';
@@ -82,16 +88,16 @@ export class BetterFileLayer extends Control {
 
   _enableDragAndDrop(): void {
     const container = this._map.getContainer();
-    DomEvent.on(container, 'dragover', DomEvent.stop)
-      .on(container, 'drop', DomEvent.stop)
-      .on(container, 'drop', this._onDragAndDrop, this);
+    DomEvent.on(container, 'dragover', DomEvent.stop);
+    DomEvent.on(container, 'drop', DomEvent.stop);
+    DomEvent.on(container, 'drop', this._onDragAndDrop, this);
   }
 
   _disableDragAndDrop(): void {
     const container = this._map.getContainer();
-    DomEvent.off(container, 'dragover', DomEvent.stop)
-      .off(container, 'drop', DomEvent.stop)
-      .off(container, 'drop', this._onDragAndDrop, this);
+    DomEvent.off(container, 'dragover', DomEvent.stop);
+    DomEvent.off(container, 'drop', DomEvent.stop);
+    DomEvent.off(container, 'drop', this._onDragAndDrop, this);
   }
 
   _onDragAndDrop(e: Event): void {
@@ -106,11 +112,27 @@ export class BetterFileLayer extends Control {
     void this._load(Array.from(input.files));
   }
 
+  private _prepareLayer(): void {
+    /* setting the default behaviors of layer */
+    this.options.layer.options.style = this.options.style;
+    this.options.layer.options.onEachFeature = this.options.onEachFeature;
+  }
+
+  private _fire<K extends keyof BflEventPayloads>(
+    event: K,
+    payload: BflEventPayloads[K],
+  ): void {
+    this._map.fire(event, payload);
+  }
+
   async _load(files: File[]): Promise<void> {
     if (!files.length) return;
 
     let processed = files;
 
+    /* For every format, they can preprocess the file list based on their needs.
+     * Ex.: Shapefile removes the components (.shp, .dbf, ...) and compress them with Zip.
+     * */
     for (const format of this._formats.registry) {
       /* Process file list inplace */
       processed = await format.preprocess(processed);
@@ -143,6 +165,7 @@ export class BetterFileLayer extends Control {
       this._prepareLayer();
 
       try {
+        /* Parse and then load the data inside Leaflet GeoJSON Layer (this.options.layer) */
         await format.load({
           file,
           layer: this.options.layer,
@@ -183,15 +206,5 @@ export class BetterFileLayer extends Control {
         });
       }
     }
-  }
-
-  private _prepareLayer(): void {
-    /* setting the default behaviors of layer */
-    this.options.layer.options.style = this.options.style;
-    this.options.layer.options.onEachFeature = this.options.onEachFeature;
-  }
-
-  private _fire<K extends keyof BflEventPayloads>(event: K, payload: BflEventPayloads[K]): void {
-    this._map.fire(event, payload);
   }
 }

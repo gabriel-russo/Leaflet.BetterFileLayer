@@ -1,5 +1,6 @@
-import { test, expect } from 'vitest';
 import type { Feature } from 'geojson';
+import { test, expect } from 'vitest';
+
 import {
   bytesToKilobytes,
   getFileBaseName,

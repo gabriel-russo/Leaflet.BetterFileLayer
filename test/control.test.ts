@@ -1,6 +1,8 @@
-import { test, expect, beforeEach, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
+
 import { Map } from 'leaflet';
+import { test, expect, beforeEach, afterEach } from 'vitest';
+
 import { BetterFileLayer } from '@/leaflet.control';
 import {
   FileNotSupportedEvent,
@@ -89,7 +91,9 @@ test('fires bfl:layerisempty when the file has no features', async () => {
   const events: LayerIsEmptyEvent[] = [];
   map.on('bfl:layerisempty', (event) => events.push(event));
 
-  await bfl._load([textFile('{"type":"FeatureCollection","features":[]}', 'empty.geojson')]);
+  await bfl._load([
+    textFile('{"type":"FeatureCollection","features":[]}', 'empty.geojson'),
+  ]);
 
   expect(events).toHaveLength(1);
 });

@@ -13,4 +13,5 @@ class ResizeObserverStub {
 }
 
 globalThis.ResizeObserver =
-  globalThis.ResizeObserver ?? (ResizeObserverStub as unknown as typeof ResizeObserver);
+  globalThis.ResizeObserver ??
+  (ResizeObserverStub as unknown as typeof ResizeObserver);

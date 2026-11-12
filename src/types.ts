@@ -1,6 +1,13 @@
-import { Control } from 'leaflet';
-import type { Map, ControlOptions, ControlPosition, GeoJSON, Layer, PathOptions } from 'leaflet';
 import type { Feature } from 'geojson';
+import { Control } from 'leaflet';
+import type {
+  Map,
+  ControlOptions,
+  ControlPosition,
+  GeoJSON,
+  Layer,
+  PathOptions,
+} from 'leaflet';
 
 /*
  * EVENT NAMES
@@ -103,15 +110,35 @@ declare module 'leaflet' {
    * Extends built in leaflet Layer Options.
    */
   interface Evented {
-    on(type: 'bfl:layerloaded', fn: LayerLoadedEventHandler, context?: never): this;
+    on(
+      type: 'bfl:layerloaded',
+      fn: LayerLoadedEventHandler,
+      context?: never,
+    ): this;
 
-    on(type: 'bfl:layerloaderror', fn: LayerLoadErrorEventHandler, context?: never): this;
+    on(
+      type: 'bfl:layerloaderror',
+      fn: LayerLoadErrorEventHandler,
+      context?: never,
+    ): this;
 
-    on(type: 'bfl:filenotsupported', fn: FileNotSupportedEventHandler, context?: never): this;
+    on(
+      type: 'bfl:filenotsupported',
+      fn: FileNotSupportedEventHandler,
+      context?: never,
+    ): this;
 
-    on(type: 'bfl:layerisempty', fn: LayerIsEmptyEventHandler, context?: never): this;
+    on(
+      type: 'bfl:layerisempty',
+      fn: LayerIsEmptyEventHandler,
+      context?: never,
+    ): this;
 
-    on(type: 'bfl:filesizelimit', fn: FileSizeLimitEventHandler, context?: never): this;
+    on(
+      type: 'bfl:filesizelimit',
+      fn: FileSizeLimitEventHandler,
+      context?: never,
+    ): this;
   }
 }
 
@@ -200,5 +227,8 @@ export declare class BetterFileLayer extends Control {
 
   private _prepareLayer(): void;
 
-  private _fire<K extends keyof BflEventPayloads>(event: K, payload: BflEventPayloads[K]): void;
+  private _fire<K extends keyof BflEventPayloads>(
+    event: K,
+    payload: BflEventPayloads[K],
+  ): void;
 }
